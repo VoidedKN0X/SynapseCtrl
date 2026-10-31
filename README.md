@@ -1,0 +1,186 @@
+# SynapseCtrl
+
+**Administer your self-hosted Matrix Synapse server from your phone.**
+
+[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/SynapseCtrl?label=download)](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
+
+SynapseCtrl is an Android admin app for [Synapse](https://github.com/element-hq/synapse), the Matrix homeserver. It uses Synapse's admin API to manage users, invites, rooms, media, reports and server health. It's an admin tool, not a chat client: for chatting, use [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) or any other Matrix app.
+
+Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
+
+## Features
+
+SynapseCtrl is being built in stages. **Available now (0.1.0):**
+
+- **Sign in** with an admin account's password (SynapseCtrl gets its own access token and never stores the password), or paste an access token
+- **Admin check:** SynapseCtrl confirms the account is a server admin before saving it, and shows the Synapse version
+- **Several servers**, a **read-only mode** per server, **app lock**, **Hide in screenshots** and **Hide in recent apps**
+- **Notifications** when a server can't be reached or its token stops working, from SynapseCtrl's own background checks, with optional **push through ntfy**
+
+**Coming in the next versions:**
+
+- **Overview:** version, user, room and media counts, open reports, and health checks for well-known, federation and MatrixRTC calls
+- **Users:** search, filter and sort; create users; reset passwords, admin rights, devices, shadow-ban, rate limits and deactivate (with erase)
+- **Invites:** registration tokens, and a ready-made invite to share through Android's share sheet
+- **Rooms:** members and state, make yourself room admin, block, and delete rooms with progress
+- **Media:** storage per user, purging cached remote media, deleting old or large local media, and quarantine
+- **Reports and federation:** reported events and federation destinations
+- **Server notices**, more notifications, a home screen widget and app shortcuts
+
+## Screenshots
+
+Coming soon.
+
+## Requirements
+
+- Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
+- A Synapse server and an account that is a **server admin** (see [Create an admin account](#create-an-admin-account))
+- **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
+
+## Install
+
+1. Download the latest `.apk` file from the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest).
+2. Open it on your phone. Android may ask you to allow installing apps from your browser or file manager.
+3. Updates install over the old version. Your settings are kept.
+
+**Automatic updates:** on your phone, tap one of the buttons below.
+
+- **Obtainium:** install [Obtainium](https://github.com/ImranR98/Obtainium) first. The button adds SynapseCtrl and installs every new release for you.
+- **F-Droid:** adds the [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) to F-Droid, Droid-ify or Neo Store, with every Ctrl app and automatic updates.
+
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/SynapseCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
+
+If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X/SynapseCtrl` in Obtainium by hand.
+
+## Getting started
+
+1. Open SynapseCtrl and enter the address where Synapse answers, like `https://chat.example.org`, or its LAN address like `http://192.168.1.20:8008` (see [Keep the admin API off the internet](#keep-the-admin-api-off-the-internet)). Without `http://`, SynapseCtrl uses HTTPS. SynapseCtrl only ever connects to this exact address; there's no second or fallback address.
+2. Sign in with an admin account: its username (`axel` or `@axel:example.org`) and password, or paste an access token.
+   - With a password, SynapseCtrl logs in once and gets its own access token and device, **SynapseCtrl (Android)**. The password is never stored.
+   - A pasted token is logged out when you remove the server from SynapseCtrl, so don't paste the token your chat app uses.
+3. If Synapse uses a self-signed certificate, compare the fingerprint SynapseCtrl shows with your certificate's (on the server: `openssl x509 -in cert.pem -noout -fingerprint -sha256`), then tap **Trust**.
+4. SynapseCtrl checks that the account is a server admin and shows the Synapse version. Choose whether to use **read-only mode**, and tap **Continue**.
+
+Your servers, **Settings** and **About** are on the **You** page: tap your profile picture at the top right of any tab. **Remove server** logs SynapseCtrl's access token out on the server first, so it stops working there too.
+
+## Create an admin account
+
+SynapseCtrl only works with an account that is a Synapse **server admin**. On the server (for example in the Synapse container), either:
+
+- **Create a new admin user:** `register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml --admin http://localhost:8008` (use the path to your `homeserver.yaml`; it needs `registration_shared_secret` set in it), or
+- **Make an existing user admin** in Synapse's database: `UPDATE users SET admin = 1 WHERE name = '@axel:example.org';` (with `sqlite3` or `psql`, whichever database Synapse uses), or from another admin account with the admin API.
+
+A separate admin account for SynapseCtrl, rather than your everyday chat account, keeps admin rights off the account you chat with.
+
+## Keep the admin API off the internet
+
+The admin API (`/_synapse/admin`) can do anything on your server, so it's best not reachable from the internet at all. Matrix clients and other servers never need it.
+
+**In Nginx Proxy Manager:** edit the proxy host for your Synapse address, open the **Advanced** tab and add:
+
+```nginx
+location /_synapse/admin {
+    deny all;
+}
+```
+
+Then point SynapseCtrl straight at Synapse's LAN address, like `http://192.168.1.20:8008`, and use it at home or over your VPN. Plain HTTP is allowed for addresses on your own network, after you switch it on for that server. Synapse must listen on that address: in `homeserver.yaml`, the HTTP listener with the `client` resource needs `bind_addresses` that include the LAN interface (for example `['0.0.0.0']`).
+
+If SynapseCtrl says the server answers but not on `/_synapse/admin`, it's talking to an address where the admin API is blocked: use the LAN address instead. SynapseCtrl never switches addresses on its own.
+
+## Matrix Authentication Service (MAS)
+
+If your Synapse uses [Matrix Authentication Service](https://github.com/element-hq/matrix-authentication-service) for logins, it doesn't offer password login, and SynapseCtrl says so. Paste an access token that has admin rights instead. With MAS, such a token can be made with `mas-cli manage issue-compatibility-token <username> --yes-i-want-to-grant-synapse-admin-privileges`. With MAS, MAS manages some account actions (like passwords and creating accounts) itself, so Synapse may refuse them from the admin API; SynapseCtrl then shows Synapse's error.
+
+## App lock
+
+Turn it on: tap your profile picture › **Settings › Privacy and security › App lock**. It's off until you turn it on.
+
+- **Its own app PIN** of at least 6 digits, separate from your phone's screen lock. Very obvious PINs such as 111111 or 123456 are refused.
+- **Unlock with fingerprint** (optional) only accepts strong biometrics, checked by the phone's secure hardware. The PIN is still needed after the phone restarts and at least every 72 hours.
+- **Your admin access tokens are encrypted with the PIN while SynapseCtrl is locked.** The key only exists in memory while the app is unlocked, and nothing is sent to your servers until you unlock. The PIN itself is never stored.
+- **Wrong PINs:** after 5 tries you wait 30 seconds, doubling up to 15 minutes.
+- **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts.
+- **Forgot your PIN?** It can't be recovered, because it encrypts your tokens. The lock screen offers to remove your servers so you can add them again. The old tokens stay valid on the server until you log them out there.
+- **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server. One confirmation covers the next minute.
+- **Background checks** for notifications have to reach your servers while SynapseCtrl is locked. While they're on, your tokens are only encrypted with the Android Keystore, as without the app lock.
+
+**Hide in screenshots** and **Hide in recent apps** (in the same section, both off by default): the first keeps SynapseCtrl out of screenshots and screen recordings, the second shows a blank card in the recent-apps view. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
+
+## Notifications
+
+Synapse can't send notifications itself, so SynapseCtrl checks your servers in the background: tap your profile picture › **Settings › Notifications** and turn on **Check in the background** (off until you do; every 15, 30, 60 or 120 minutes). For now it notifies when a server can't be reached twice in a row, or its token or admin access stops working. More events (new reports, failing health checks, media storage, new users) come in a later version.
+
+Synapse has no built-in webhook or push for reports or new registrations; only a custom Synapse module could add one. SynapseCtrl's background checks are therefore the main source of notifications, and ntfy can wake them up early.
+
+### Push through ntfy (optional)
+
+Android runs background checks at most every 15 minutes, often later. With [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) (UnifiedPush) a push can start the check straight away. A push is only a wake-up call: SynapseCtrl ignores what it says, checks your servers as usual and notifies about what it finds, at most once a minute.
+
+1. Install ntfy and connect it to your ntfy server.
+2. In SynapseCtrl: tap your profile picture › **Settings › Notifications**, turn on **Check in the background** and **Check when ntfy pushes**, then tap **Push address** to copy it. Treat it like a password.
+3. Let something on your network post to that address, like a cron job: `*/5 * * * * curl -fsS -d check 'https://ntfy.example.com/upAbC123?up=1' >/dev/null`
+
+On ColorOS and other phones that close background apps, allow SynapseCtrl and ntfy to run in the background (the Battery rows on the same page open the right settings).
+
+## Privacy
+
+**Telemetry-free.** SynapseCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the Synapse servers you add, and refuses to connect anywhere else. With push turned on, the ntfy app on your phone delivers wake-up calls to SynapseCtrl; SynapseCtrl itself never connects to your ntfy server. See [PRIVACY.md](PRIVACY.md).
+
+- **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
+
+## Build from source
+
+You need [Android Studio](https://developer.android.com/studio), or JDK 17 and the Android SDK.
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/VoidedKN0X/SynapseCtrl.git
+   cd SynapseCtrl
+   ```
+2. Build the app:
+   ```bash
+   ./gradlew assembleDebug
+   ```
+   On Windows, use `gradlew.bat assembleDebug`.
+3. The APK is in `app/build/outputs/apk/debug/`. Copy it to your phone and install it.
+
+Or open the folder in Android Studio and press **Run** with your phone connected.
+
+## Support the project
+
+SynapseCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). Starring the repo and [reporting bugs](https://github.com/VoidedKN0X/SynapseCtrl/issues) helps too.
+
+In the app, the **About** section at the bottom of the **You** page (tap your profile picture) has **Support SynapseCtrl** and **Report a bug** rows that open these pages.
+
+## The Ctrl series
+
+Native Android apps for self-hosted services and everyday tools, all with the same "Ctrl / Signal" design, dark or light with your phone.
+
+| App | What it's for |
+| --- | --- |
+| [AdCtrl](https://github.com/VoidedKN0X/AdCtrl) | Control your AdGuard Home DNS server |
+| [ArrCtrl](https://github.com/VoidedKN0X/ArrCtrl) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
+| [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
+| [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
+| [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) | Matrix chat client for matrix.org and self-hosted Synapse |
+| [FilesCtrl](https://github.com/VoidedKN0X/FilesCtrl) | File manager with NFS, SMB, SFTP, FTP and WebDAV |
+| [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
+| [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
+| [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
+| [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
+| [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
+| [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
+| [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
+| **SynapseCtrl** (this app) | Administer your Matrix Synapse server |
+| [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
+
+## License
+
+SynapseCtrl is licensed under the [GNU General Public License v3.0](LICENSE). © VKNXWorks
+
+The bundled fonts are licensed under the SIL Open Font License 1.1: [Space Grotesk](https://github.com/floriankarsten/space-grotesk) (see `FONT-LICENSE-SpaceGrotesk.txt`) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (see `FONT-LICENSE-JetBrainsMono.txt`).
+
+SynapseCtrl is not affiliated with or endorsed by Element or the Matrix.org Foundation. Matrix and Synapse are trademarks of their owners.

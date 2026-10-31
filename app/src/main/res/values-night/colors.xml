@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ctrl / Signal (dark) background, shown before the app draws. -->
+    <color name="window_bg">#FF08080A</color>
+    <color name="notification_accent">#FFB48CFF</color>
+</resources>

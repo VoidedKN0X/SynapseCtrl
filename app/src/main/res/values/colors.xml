@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ctrl / Signal Light background, shown before the app draws (dark mode: values-night). -->
+    <color name="window_bg">#FFF5F5F1</color>
+    <color name="ic_bg">#FF08080A</color>
+    <!-- Notification accent: the accent text colour of each theme. -->
+    <color name="notification_accent">#FF6A3BDB</color>
+</resources>
