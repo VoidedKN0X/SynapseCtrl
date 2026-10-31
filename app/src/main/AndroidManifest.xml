@@ -39,6 +39,9 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- Push from ntfy: the push address and wake-up messages. Exported because ntfy is another app;
@@ -65,6 +68,19 @@
                 <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND" />
             </intent-filter>
         </service>
+
+        <!-- Home screen widget: the active server online or not, active users and open reports. -->
+        <receiver
+            android:name=".ui.widgets.StatusWidget"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_status_info" />
+        </receiver>
 
         <!-- WorkManager's diagnostics receiver (debug dumps over adb) isn't needed; leave it out. -->
         <receiver

@@ -14,6 +14,12 @@ import com.vknxworks.synapsectrl.data.notify.Push
 import com.vknxworks.synapsectrl.data.notify.PushStatus
 import com.vknxworks.synapsectrl.ui.lock.AppLock
 import com.vknxworks.synapsectrl.data.server.HostAllowlist
+import com.vknxworks.synapsectrl.data.health.HealthChecker
+import com.vknxworks.synapsectrl.data.overview.OverviewRepository
+import com.vknxworks.synapsectrl.data.widget.WidgetData
+import com.vknxworks.synapsectrl.data.widget.WidgetRefreshWorker
+import com.vknxworks.synapsectrl.data.widget.WidgetStore
+import com.vknxworks.synapsectrl.ui.widgets.StatusWidget
 import com.vknxworks.synapsectrl.data.server.ServerStore
 import com.vknxworks.synapsectrl.data.server.Sessions
 import com.vknxworks.synapsectrl.data.settings.SettingsRepository
@@ -29,6 +35,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
+
+/** A launcher shortcut, waiting for the main screen (and the app lock) to handle it. */
+enum class ShortcutAction { INVITE, USERS, REPORTS }
 
 /** Manual dependency container; one per process. */
 class AppContainer(val context: Context) {
@@ -86,6 +95,13 @@ class AppContainer(val context: Context) {
 
     val sessions = Sessions(serverStore, http, appScope, locked)
 
+    /** Health checks against the public discovery endpoints; their own HTTP client, never with the token. */
+    val health = HealthChecker()
+    val overview = OverviewRepository(sessions, health, appScope) { server, summary -> WidgetData.fromSummary(context, server, summary) }
+
+    /** Set by MainActivity when a launcher shortcut opened SynapseCtrl; the main screen handles it after unlocking. */
+    val pendingShortcut = MutableStateFlow<ShortcutAction?>(null)
+
     /** Turns the app lock on with [pin]: every saved password is sealed with it from now on. */
     suspend fun enableLock(pin: String) {
         // Unlocked first, so the lock screen doesn't flash up while the PIN is being saved.
@@ -110,6 +126,7 @@ class AppContainer(val context: Context) {
         withContext(Dispatchers.IO) {
             serverStore.removeAll()
             CheckStore.forgetAll(context)
+            WidgetStore.clear(context)
         }
         Notifier.cancelAll(context)
         sessions.forgetSecrets()
@@ -117,6 +134,7 @@ class AppContainer(val context: Context) {
         AppLock.markUnlocked()
         locked.value = false
         settings.update { it.copy(lockChanges = false) }
+        StatusWidget.redraw(context)
     }
 
     /** Locked: wipe the key and every decrypted password from memory; requests wait until unlocked. */
@@ -126,6 +144,8 @@ class AppContainer(val context: Context) {
             locked.value = true
             sessions.forgetSecrets()
         }
+        // With sealed tokens the widget now only says that SynapseCtrl is locked.
+        StatusWidget.redraw(context)
     }
 
     fun onUnlocked() {
@@ -134,12 +154,18 @@ class AppContainer(val context: Context) {
         // Seal any password left unsealed (SynapseCtrl stopped between setting up the lock and sealing them),
         // and match background checks turned on or off since.
         if (vault.enabled) appScope.launch { runCatching { serverStore.applySealing(sealing()) } }
+        if (StatusWidget.anyPlaced(context)) {
+            StatusWidget.redraw(context)
+            WidgetRefreshWorker.enqueue(context)
+        }
     }
 
     /** A server was removed: its notifications and check state go too. */
     fun forgetServer(id: String) {
+        overview.forget(id)
         CheckStore.forget(context, id)
         Notifier.cancelServer(context, id)
+        if (StatusWidget.anyPlaced(context)) WidgetRefreshWorker.enqueue(context)
     }
 
     init {

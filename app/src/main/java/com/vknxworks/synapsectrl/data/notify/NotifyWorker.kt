@@ -13,6 +13,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.vknxworks.synapsectrl.container
+import com.vknxworks.synapsectrl.data.widget.WidgetData
+import com.vknxworks.synapsectrl.ui.widgets.StatusWidget
 import com.vknxworks.synapsectrl.data.api.ApiJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +72,7 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
         val notify = c.notifySettings.current()
         if (!notify.polling && !inputData.getBoolean(KEY_FORCE, false)) return Result.success()
         val servers = c.sessions.servers.value
-        val checker = Checker(applicationContext)
+        val checker = Checker(applicationContext, c.health)
         for (server in servers) {
             if (c.serverStore.sealedNow(server.id)) continue
             val prev = CheckStore.read(applicationContext, server.id)
@@ -81,6 +83,8 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             result.post.forEach { Notifier.post(applicationContext, it) }
             CheckStore.write(applicationContext, server.id, result.state)
         }
+        // Widgets get fresh numbers with every check.
+        if (StatusWidget.anyPlaced(applicationContext)) runCatching { WidgetData.refresh(applicationContext) }
         return Result.success()
     }
 

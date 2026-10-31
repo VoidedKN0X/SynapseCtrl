@@ -21,7 +21,11 @@ import kotlinx.coroutines.flow.stateIn
  * [defaultOn]: the important ones are on as soon as background checks are, the rest are opt-in.
  */
 enum class NotifyEvent(@StringRes val label: Int, @StringRes val summary: Int, val defaultOn: Boolean) {
+    REPORT(R.string.ev_report, R.string.ev_report_sub, true),
+    HEALTH(R.string.ev_health, R.string.ev_health_sub, true),
     UNREACHABLE(R.string.ev_unreachable, R.string.ev_unreachable_sub, true),
+    NEW_USER(R.string.ev_new_user, R.string.ev_new_user_sub, true),
+    MEDIA(R.string.ev_media, R.string.ev_media_sub, false),
 }
 
 data class NotifySettings(
@@ -35,11 +39,14 @@ data class NotifySettings(
     val push: Boolean = false,
     /** The events that are switched on. */
     val events: Set<NotifyEvent> = NotifyEvent.entries.filter { it.defaultOn }.toSet(),
+    /** Local media above this many gigabytes counts as "over the limit" (Overview and notifications). */
+    val mediaThresholdGb: Int = 50,
 ) {
     fun on(e: NotifyEvent): Boolean = e in events
 
     companion object {
         val INTERVALS = listOf(15, 30, 60, 120)
+        val MEDIA_THRESHOLDS = listOf(5, 10, 25, 50, 100, 250, 500, 1000)
     }
 }
 
@@ -49,6 +56,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
         val interval = intPreferencesKey("notify_interval")
         val push = booleanPreferencesKey("notify_push")
         val events = stringSetPreferencesKey("notify_events")
+        val mediaThreshold = intPreferencesKey("notify_media_threshold_gb")
     }
 
     /** A copy of [NotifySettings.polling] that can be read without waiting, for the password sealing. */
@@ -70,6 +78,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
         push = this[K.push] ?: false,
         events = this[K.events]?.mapNotNull { n -> NotifyEvent.entries.firstOrNull { it.name == n } }?.toSet()
             ?: NotifyEvent.entries.filter { it.defaultOn }.toSet(),
+        mediaThresholdGb = (this[K.mediaThreshold] ?: 50).let { if (it in NotifySettings.MEDIA_THRESHOLDS) it else 50 },
     )
 
     suspend fun update(transform: (NotifySettings) -> NotifySettings) {
@@ -80,6 +89,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
             p[K.interval] = s.intervalMinutes
             p[K.push] = s.push
             p[K.events] = s.events.map { it.name }.toSet()
+            p[K.mediaThreshold] = s.mediaThresholdGb
             polling = s.polling
         }
         mirror.edit().putBoolean("polling", polling).commit()

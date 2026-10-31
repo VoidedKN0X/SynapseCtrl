@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher shortcut "reports": a glyph on the graphite circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#FF1C1C21"
+        android:pathData="M24,0 A24,24 0 1 1 23.99,0 Z" />
+    <group
+        android:translateX="12"
+        android:translateY="12">
+        <path
+            android:fillColor="#FFB48CFF"
+            android:pathData="M14.4,6L14,4H5v17h2v-7h5.6l0.4,2h7V6z" />
+    </group>
+</vector>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher shortcuts (long-press the SynapseCtrl icon). They only open SynapseCtrl: the app lock asks
+     first, and a new invite token is only made after you confirm it on the phone. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_invite"
+        android:shortcutId="invite"
+        android:shortcutLongLabel="@string/shortcut_invite_long"
+        android:shortcutShortLabel="@string/shortcut_invite">
+        <intent
+            android:action="com.vknxworks.synapsectrl.INVITE"
+            android:targetClass="com.vknxworks.synapsectrl.MainActivity"
+            android:targetPackage="com.vknxworks.synapsectrl" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_users"
+        android:shortcutId="users"
+        android:shortcutLongLabel="@string/shortcut_users_long"
+        android:shortcutShortLabel="@string/shortcut_users">
+        <intent
+            android:action="com.vknxworks.synapsectrl.USERS"
+            android:targetClass="com.vknxworks.synapsectrl.MainActivity"
+            android:targetPackage="com.vknxworks.synapsectrl" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_reports"
+        android:shortcutId="reports"
+        android:shortcutLongLabel="@string/shortcut_reports_long"
+        android:shortcutShortLabel="@string/shortcut_reports">
+        <intent
+            android:action="com.vknxworks.synapsectrl.REPORTS"
+            android:targetClass="com.vknxworks.synapsectrl.MainActivity"
+            android:targetPackage="com.vknxworks.synapsectrl" />
+    </shortcut>
+</shortcuts>

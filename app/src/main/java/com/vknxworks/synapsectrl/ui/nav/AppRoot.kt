@@ -23,7 +23,19 @@ import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.PermMedia
-import com.vknxworks.synapsectrl.ui.placeholder.ComingNextTab
+import com.vknxworks.synapsectrl.ShortcutAction
+import com.vknxworks.synapsectrl.ui.invites.InvitesScreen
+import com.vknxworks.synapsectrl.ui.media.MediaScreen
+import com.vknxworks.synapsectrl.ui.media.UserMediaScreen
+import com.vknxworks.synapsectrl.ui.notices.ServerNoticeScreen
+import com.vknxworks.synapsectrl.ui.reports.FederationScreen
+import com.vknxworks.synapsectrl.ui.reports.ReportScreen
+import com.vknxworks.synapsectrl.ui.reports.ReportsScreen
+import com.vknxworks.synapsectrl.ui.rooms.RoomScreen
+import com.vknxworks.synapsectrl.ui.rooms.RoomsScreen
+import com.vknxworks.synapsectrl.ui.users.CreateUserScreen
+import com.vknxworks.synapsectrl.ui.users.UserScreen
+import com.vknxworks.synapsectrl.ui.users.UsersScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
@@ -118,8 +130,23 @@ private fun MainScaffold() {
         }
     }
 
+    // Launcher shortcuts: open the right place once SynapseCtrl is unlocked.
     val c = LocalContext.current.container
+    val shortcut by c.pendingShortcut.collectAsStateWithLifecycle()
     val covered = lockCovering(c.vault)
+    LaunchedEffect(shortcut, covered, backStack != null) {
+        val action = shortcut ?: return@LaunchedEffect
+        if (covered || backStack == null) return@LaunchedEffect
+        c.pendingShortcut.value = null
+        when (action) {
+            ShortcutAction.USERS -> selectTab(1)
+            ShortcutAction.REPORTS -> selectTab(4)
+            ShortcutAction.INVITE -> {
+                selectTab(0)
+                navController.navigate(InvitesRoute(create = true)) { launchSingleTop = true }
+            }
+        }
+    }
 
     // Android 13+ drops notifications until they're allowed: with background checks on, ask once,
     // as soon as SynapseCtrl is unlocked. After that, Notifications in Settings shows it and offers the fix.
@@ -221,20 +248,20 @@ private fun AppNavHost(navController: NavHostController) {
         topDestinations.forEach { top ->
             when (top.route) {
                 OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
-                UsersRoute -> composable<UsersRoute> {
-                    ComingNextTab(stringResource(R.string.tab_users), Icons.Outlined.Group, stringResource(R.string.coming_next_users))
-                }
-                RoomsRoute -> composable<RoomsRoute> {
-                    ComingNextTab(stringResource(R.string.tab_rooms), Icons.Outlined.Forum, stringResource(R.string.coming_next_rooms))
-                }
-                MediaRoute -> composable<MediaRoute> {
-                    ComingNextTab(stringResource(R.string.tab_media), Icons.Outlined.PermMedia, stringResource(R.string.coming_next_media))
-                }
-                ReportsRoute -> composable<ReportsRoute> {
-                    ComingNextTab(stringResource(R.string.tab_reports), Icons.Outlined.Flag, stringResource(R.string.coming_next_reports))
-                }
+                UsersRoute -> composable<UsersRoute> { UsersScreen() }
+                RoomsRoute -> composable<RoomsRoute> { RoomsScreen() }
+                MediaRoute -> composable<MediaRoute> { MediaScreen() }
+                ReportsRoute -> composable<ReportsRoute> { ReportsScreen() }
             }
         }
+        composable<UserRoute> { UserScreen(it.toRoute<UserRoute>().userId) }
+        composable<CreateUserRoute> { CreateUserScreen() }
+        composable<UserMediaRoute> { UserMediaScreen(it.toRoute<UserMediaRoute>().userId) }
+        composable<InvitesRoute> { InvitesScreen(createOnOpen = it.toRoute<InvitesRoute>().create) }
+        composable<RoomRoute> { RoomScreen(it.toRoute<RoomRoute>().roomId) }
+        composable<ReportRoute> { ReportScreen(it.toRoute<ReportRoute>().id) }
+        composable<FederationRoute> { FederationScreen() }
+        composable<ServerNoticeRoute> { ServerNoticeScreen(it.toRoute<ServerNoticeRoute>().userId) }
         composable<YouRoute> { YouScreen() }
         composable<SettingsRoute> { SettingsScreen() }
         composable<NotificationsRoute> { NotificationsScreen() }

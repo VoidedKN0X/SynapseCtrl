@@ -2,6 +2,44 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.0 (2026-10-31)
+
+SynapseCtrl is complete: everything for running your Synapse server from your phone is in this release.
+
+### New
+
+- **Overview** with Synapse's version, active and deactivated users, rooms, local media size and open event reports. Pull down to load it again.
+- **Needs attention** on the Overview: failing health checks, open event reports, servers your server can't reach over federation, local media over your limit and database updates that are running. Tap one to go where it can be handled.
+- **Health checks** on the Overview, each with a pass, warning or fail and a short explanation: Synapse reachable at the saved address, client discovery (`/.well-known/matrix/client` points apps to your server, and that address answers), server discovery (`/.well-known/matrix/server`), federation (your server answers other servers with its version and signing keys) and calls (client discovery lists your MatrixRTC LiveKit service, and it answers). No outside tester service is used.
+- **Users tab:** every local user with avatar, display name, user ID, admin, deactivated, shadow-banned, suspended and guest tags, when they were last seen and how many devices they have. Search by name or user ID, filter by active, admins, deactivated, guests or all, and sort by user ID, display name, newest or last seen.
+- **Create users** with a username, optional display name, a generated strong password you can copy, and an optional server admin switch. SynapseCtrl checks the user ID is free first, so an existing account is never changed by mistake.
+- **User page** with the profile (change the display name), creation and last-seen time, devices with their IP address and last activity (log out one, or all), joined rooms, uploaded media and the rate limit.
+- **User actions:** reset the password (generated and copyable, optionally logging out every device), make or remove server admin, shadow-ban, suspend, lock the account, override or remove the rate limit, quarantine all their media, send them a server notice, and **deactivate** with an optional GDPR erase, explained, which needs the user ID typed in. Admin, ban, lock and deactivate aren't offered for the account SynapseCtrl is signed in with.
+- **Invites:** registration tokens with how often they were used, how many sign-ups are left and when they expire. Create one (random or your own, with a number of uses and 1 day to no end date), change or delete it, and **share a ready-made invite** through Android's share sheet with your server, the token and how to sign up with ChatCtrl or another Matrix app.
+- **Rooms tab:** every room with avatar, name or address, local and total members, creator and state events, and space, public, encrypted and local-only tags. Search by name, address or room ID, filter by public, empty or large, and sort by name, members, local members or state events.
+- **Room page** with members (local people first, tap to open their account), access and encryption settings, room version, history visibility, state events by type and whether it's blocked.
+- **Room actions:** make your admin account room admin, remove a local member (as a kick by your admin account), block or unblock the room, quarantine all its media, and **delete the room** with block, purge and an optional new room for the members, after typing the room ID. The deletion runs on the server and SynapseCtrl shows its progress, who was removed and any new room.
+- **Media tab:** local media size and file count, the users with the most media, and each user's files (newest or biggest first) with quarantine, lift quarantine, copy the mxc:// address and delete.
+- **Media cleanup:** purge cached remote media not used for 7 to 365 days, and delete local media not opened for 30 days to 2 years and larger than a size you pick, keeping profile pictures if you want. SynapseCtrl counts the matching files first and asks you to type the server name before deleting.
+- **Quarantine by media ID**, for a single file from your server or another.
+- **Reports tab:** event reports newest first with the reason, score, reporter, sender and room. A report's page shows the reported message itself, and leads to the sender's account and the room; delete a report once it's handled. **User reports** (about a whole account) are listed too.
+- **Federation:** every server yours talks to, failing ones first with since when and the next try, and **reset connection** for a server that's back up.
+- **Server notices** to one user or to every active local user (bots and bridges left out), with a preview and a confirmation.
+- **More notifications** from the background checks: new event reports, failing health checks, new users and local media over a limit you set (5 GB to 1 TB), next to unreachable servers.
+- **Home screen widget** with your server online or not, active users and open reports. Tap it to open SynapseCtrl. It refreshes with the Overview, every background check and every 30 minutes, and only says SynapseCtrl is locked while your token is sealed by the app lock.
+- **App shortcuts** (long-press the icon): New invite, Users and Reports. With the app lock on, SynapseCtrl asks for your PIN first, and a new invite is only created after you confirm it.
+- **Avatars** of users and rooms, loaded as small thumbnails from your own server.
+
+### Changed
+
+- The Users, Rooms, Media and Reports tabs now do what they said was coming.
+- The Overview shows the server's numbers, attention list and health checks instead of the sign-in summary, and has rows for Invites, Federation and Server notices.
+
+### Security
+
+- The health checks use their own connection that only makes HTTPS GET requests without your token, to your server name and the hosts its discovery files name.
+- Read-only mode hides every new action and refuses to send any change, and every change asks for a confirmation (and your fingerprint or app PIN with **Confirm changes** on).
+
 ## v0.1.0 (2026-10-31)
 
 The first version of SynapseCtrl, an admin app for your self-hosted Matrix Synapse server. This version signs in to your server and checks admin access; users, invites, rooms, media, reports and health checks follow in the next versions.

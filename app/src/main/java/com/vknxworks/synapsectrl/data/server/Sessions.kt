@@ -118,6 +118,12 @@ class Sessions(
         }
     }
 
+    /** A screen loaded the active server's status itself: share it, so the connection card stays current. */
+    fun reportStatus(serverId: String, status: ServerStatus) {
+        if (active.value?.server?.id != serverId) return
+        _connection.value = Connection(status = status, loading = false)
+    }
+
     /** A screen's request to the active server failed in a way that affects the whole connection. */
     fun reportError(serverId: String, e: ApiError) {
         if (active.value?.server?.id != serverId) return

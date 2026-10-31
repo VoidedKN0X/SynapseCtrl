@@ -10,22 +10,18 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Features
 
-SynapseCtrl is being built in stages. **Available now (0.1.0):**
-
-- **Sign in** with an admin account's password (SynapseCtrl gets its own access token and never stores the password), or paste an access token
-- **Admin check:** SynapseCtrl confirms the account is a server admin before saving it, and shows the Synapse version
-- **Several servers**, a **read-only mode** per server, **app lock**, **Hide in screenshots** and **Hide in recent apps**
-- **Notifications** when a server can't be reached or its token stops working, from SynapseCtrl's own background checks, with optional **push through ntfy**
-
-**Coming in the next versions:**
-
-- **Overview:** version, user, room and media counts, open reports, and health checks for well-known, federation and MatrixRTC calls
-- **Users:** search, filter and sort; create users; reset passwords, admin rights, devices, shadow-ban, rate limits and deactivate (with erase)
-- **Invites:** registration tokens, and a ready-made invite to share through Android's share sheet
-- **Rooms:** members and state, make yourself room admin, block, and delete rooms with progress
-- **Media:** storage per user, purging cached remote media, deleting old or large local media, and quarantine
-- **Reports and federation:** reported events and federation destinations
-- **Server notices**, more notifications, a home screen widget and app shortcuts
+- **Overview:** Synapse version, active and deactivated users, rooms, local media size and open event reports, an attention list (failing health checks, new reports, servers failing over federation, media over your limit, database updates running) and **health checks**: Synapse reachable, client and server discovery (`/.well-known/matrix/client` and `/server`), federation (version and signing keys where other servers connect) and **calls** (the MatrixRTC LiveKit service in client discovery, and that it answers). No outside tester service is used.
+- **Users:** search, filter (active, admins, deactivated, guests) and sort, with avatars, admin and status tags, last seen and device count. **Create users** with a generated password. Each user has their profile, devices with IP and last seen (log out one or all), joined rooms, uploaded media and rate limit override, and actions: **reset password**, **server admin**, **shadow-ban**, **suspend**, **lock**, **quarantine all media**, **server notice** and **deactivate** (with the GDPR erase option explained).
+- **Invites:** registration tokens with uses, remaining sign-ups and expiry; create, change and delete them, and **share a ready-made invite** through Android's share sheet, with the server, the token and how to sign up with ChatCtrl or another Matrix app.
+- **Rooms:** search, filter (public, empty, large) and sort, with members, encryption, directory and federation tags. Each room shows its settings, state and members, and offers **make me room admin**, **block**, **quarantine all media**, **remove a local member** and **delete** (block, purge and moving members to a new room), with live progress from the server.
+- **Media:** storage per user, each user's files (newest or biggest) with quarantine and delete, **purge cached remote media**, **delete old or large local media** with a count beforehand, and quarantine by media ID.
+- **Reports:** event reports with the reported message, reporter, sender and room, and user reports; delete handled reports, and go straight to the sender's account.
+- **Federation:** every server yours talks to, failing ones first, and **reset connection** for a server that's back.
+- **Server notices** to one user or to every active local user, with a preview.
+- **Notifications** from SynapseCtrl's own background checks: new event reports, failing health checks, unreachable servers, new users and media over a limit, with optional **push through ntfy**.
+- **Home screen widget** (online or not, active users, open reports) and **app shortcuts**: New invite, Users, Reports.
+- **Safe by design:** read-only mode per server, a confirmation for every change, the user or room ID typed in for deactivating, deleting a room and deleting old local media, app lock with **Confirm changes**, certificate pinning, **Hide in screenshots** and **Hide in recent apps**, and access tokens encrypted with the Android Keystore.
+- **Several servers**, and sign-in with an admin password (SynapseCtrl gets its own token and never stores the password) or a pasted access token.
 
 ## Screenshots
 
@@ -107,9 +103,24 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 
 **Hide in screenshots** and **Hide in recent apps** (in the same section, both off by default): the first keeps SynapseCtrl out of screenshots and screen recordings, the second shows a blank card in the recent-apps view. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
 
+## Using SynapseCtrl safely
+
+- **Test destructive actions on a throwaway test user and test room first**, never on your own account or real rooms. SynapseCtrl doesn't offer admin, ban, lock or deactivate actions for the account it's signed in with.
+- **Deactivate**, **delete room** and **delete old local media** can't be undone: SynapseCtrl says what will happen and asks you to type the user ID, room ID or server name first. Everything else that changes something asks for a confirmation.
+- **Removing someone from a room** isn't in Synapse's admin API, so SynapseCtrl kicks them as your admin account. That only works when your account is in the room with enough power: use **Make me room admin** first.
+- **Delete old local media** goes by when a file was last opened, not uploaded, and Synapse has no dry run: the count SynapseCtrl shows first is an estimate from each user's media list.
+- **Server notices** need `server_notices` set up in `homeserver.yaml`; without it, Synapse's error is shown.
+- **Registration tokens** only matter with `registration_requires_token: true` (and `enable_registration: true`) in `homeserver.yaml`.
+
 ## Notifications
 
-Synapse can't send notifications itself, so SynapseCtrl checks your servers in the background: tap your profile picture › **Settings › Notifications** and turn on **Check in the background** (off until you do; every 15, 30, 60 or 120 minutes). For now it notifies when a server can't be reached twice in a row, or its token or admin access stops working. More events (new reports, failing health checks, media storage, new users) come in a later version.
+Synapse can't send notifications itself, so SynapseCtrl checks your servers in the background: tap your profile picture › **Settings › Notifications** and turn on **Check in the background** (off until you do; every 15, 30, 60 or 120 minutes). Each kind can be switched on or off:
+
+- **New event reports** (on): someone on your server reported a message
+- **Health check failing** (on): client or server discovery, federation or calls stopped working
+- **Server unreachable** (on): two checks in a row couldn't reach Synapse, or its token or admin access stopped working
+- **New users** (on): someone signed up with a registration token, or an account was created
+- **Media storage over a limit** (off): local media grew past the size you pick (5 GB to 1 TB)
 
 Synapse has no built-in webhook or push for reports or new registrations; only a custom Synapse module could add one. SynapseCtrl's background checks are therefore the main source of notifications, and ntfy can wake them up early.
 
@@ -125,7 +136,7 @@ On ColorOS and other phones that close background apps, allow SynapseCtrl and nt
 
 ## Privacy
 
-**Telemetry-free.** SynapseCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the Synapse servers you add, and refuses to connect anywhere else. With push turned on, the ntfy app on your phone delivers wake-up calls to SynapseCtrl; SynapseCtrl itself never connects to your ntfy server. See [PRIVACY.md](PRIVACY.md).
+**Telemetry-free.** SynapseCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the Synapse servers you add, and refuses to connect anywhere else. The health checks also read your server's public discovery endpoints (on your server name and the hosts its `.well-known` files name), over HTTPS, without your token. With push turned on, the ntfy app on your phone delivers wake-up calls to SynapseCtrl; SynapseCtrl itself never connects to your ntfy server. See [PRIVACY.md](PRIVACY.md).
 
 - **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
 

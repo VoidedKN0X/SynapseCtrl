@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Sd
 import androidx.compose.material.icons.outlined.BatteryAlert
 import androidx.compose.material.icons.outlined.BatteryFull
 import androidx.compose.material.icons.outlined.Campaign
@@ -231,6 +232,14 @@ fun NotificationsScreen() {
                     ) { on ->
                         if (on) ensurePermission()
                         update { s -> s.copy(events = if (on) s.events + e else s.events - e) }
+                    }
+                    if (e == NotifyEvent.MEDIA && settings.on(e) && canPost) {
+                        GroupChoice(
+                            stringResource(R.string.media_limit),
+                            NotifySettings.MEDIA_THRESHOLDS.map { it to android.text.format.Formatter.formatShortFileSize(context, it * 1_000_000_000L) },
+                            settings.mediaThresholdGb,
+                            icon = Icons.Outlined.Sd,
+                        ) { gb -> update { it.copy(mediaThresholdGb = gb) } }
                     }
                 }
             }

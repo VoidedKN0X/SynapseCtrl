@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ctrl / Signal Light; values-night/widget_colors.xml has the dark Signal colours. The widget
+         follows the device's dark mode, never the wallpaper colours. -->
+    <color name="widget_bg">#FFFFFFFF</color>
+    <color name="widget_border">#FFDEDED7</color>
+    <color name="widget_text">#FF0B0B0D</color>
+    <color name="widget_text_dim">#FF5C5C64</color>
+</resources>

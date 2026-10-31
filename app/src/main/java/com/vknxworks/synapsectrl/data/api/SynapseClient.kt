@@ -60,6 +60,9 @@ sealed class Api {
 
     /** /_matrix/client/v3/… */
     data object Client : Api()
+
+    /** /_matrix/client/v1/media/… (authenticated media: avatars and thumbnails). */
+    data object Media : Api()
 }
 
 /**
@@ -94,6 +97,7 @@ class SynapseClient(
         when (api) {
             is Api.Admin -> b.addPathSegment("_synapse").addPathSegment("admin").addPathSegment("v${api.version}")
             Api.Client -> b.addPathSegment("_matrix").addPathSegment("client").addPathSegment("v3")
+            Api.Media -> b.addPathSegment("_matrix").addPathSegment("client").addPathSegment("v1").addPathSegment("media")
         }
         segments.forEach { b.addPathSegment(it) }
         query.forEach { (k, v) -> b.addQueryParameter(k, v) }
@@ -114,8 +118,35 @@ class SynapseClient(
     suspend fun put(api: Api, vararg segments: String, body: JsonElement? = null): JsonElement =
         call("PUT", api, segments.toList(), emptyList(), body ?: JsonObject(emptyMap()))
 
-    suspend fun delete(api: Api, vararg segments: String, body: JsonElement? = null): JsonElement =
-        call("DELETE", api, segments.toList(), emptyList(), body)
+    suspend fun delete(api: Api, vararg segments: String, body: JsonElement? = null, query: Map<String, String> = emptyMap()): JsonElement =
+        call("DELETE", api, segments.toList(), query.toList(), body)
+
+    /**
+     * Raw bytes of an authenticated media download (an avatar thumbnail), at most [maxBytes]. Null when
+     * the server has none. Reads only; uses the same token, pin and allowlist as every other request.
+     */
+    suspend fun bytes(api: Api, segments: List<String>, query: Map<String, String> = emptyMap(), maxBytes: Long = 512_000): ByteArray? {
+        awaitUnlocked()
+        val token = secrets().token
+        if (token.isEmpty()) return null
+        return withContext(Dispatchers.IO) {
+            val request = Request.Builder()
+                .url(url(api, segments, query.toList()))
+                .get()
+                .header("Authorization", "Bearer $token")
+                .build()
+            try {
+                http.newCall(request).execute().use { r ->
+                    val body = r.body ?: return@use null
+                    if (!r.isSuccessful || body.contentLength() > maxBytes) return@use null
+                    val bytes = body.byteStream().use { it.readNBytes(maxBytes.toInt() + 1) }
+                    bytes.takeIf { it.size <= maxBytes }
+                }
+            } catch (e: IOException) {
+                null
+            }
+        }
+    }
 
     // --- Sign-in ---
 

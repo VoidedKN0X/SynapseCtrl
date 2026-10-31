@@ -1,5 +1,6 @@
 package com.vknxworks.synapsectrl
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
         // Edge to edge; the bar icons are set to match the theme below, once it is known.
         enableEdgeToEdge()
         val c = container
+        if (savedInstanceState == null) handleIntent(intent)
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
@@ -68,5 +70,28 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    /** A launcher shortcut: the main screen handles it once SynapseCtrl is unlocked. */
+    private fun handleIntent(intent: Intent?) {
+        val action = when (intent?.action) {
+            ACTION_INVITE -> ShortcutAction.INVITE
+            ACTION_USERS -> ShortcutAction.USERS
+            ACTION_REPORTS -> ShortcutAction.REPORTS
+            else -> null
+        } ?: return
+        container.pendingShortcut.value = action
+    }
+
+    companion object {
+        const val ACTION_INVITE = "com.vknxworks.synapsectrl.INVITE"
+        const val ACTION_USERS = "com.vknxworks.synapsectrl.USERS"
+        const val ACTION_REPORTS = "com.vknxworks.synapsectrl.REPORTS"
     }
 }
