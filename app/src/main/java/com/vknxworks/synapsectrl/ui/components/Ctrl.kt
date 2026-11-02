@@ -440,7 +440,10 @@ fun CtrlAlertDialog(
     )
 }
 
-/** A bottom sheet: surface fill, 26dp top corners, 1dp border. */
+/**
+ * A bottom sheet: surface fill, 26dp top corners, no outline (the scrim separates it). No border modifier:
+ * ModalBottomSheet applies `modifier` before its own offset/drag, so a border would be drawn in the wrong place.
+ */
 @Composable
 fun CtrlSheet(
     onDismissRequest: () -> Unit,
@@ -456,7 +459,6 @@ fun CtrlSheet(
         containerColor = CtrlColors.Surface,
         contentColor = CtrlColors.Text,
         tonalElevation = 0.dp,
-        modifier = Modifier.border(CardBorder, shape),
         content = content,
     )
 }

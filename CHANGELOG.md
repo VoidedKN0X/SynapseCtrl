@@ -2,6 +2,13 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.1 (2026-11-02)
+
+### Fixed
+
+- **Bottom sheets no longer show a stray grey box or outline.** The sheet's 1dp border was drawn before the sheet slid into place, so a grey rectangle cut across the open sheet partway down and a rounded outline was left near the top of the screen. Sheets are now a plain surface with 26dp top corners and no outline; the dimmed background already sets them apart. Their colour, corners, drag handle, dim and behaviour are unchanged.
+- Applies to every bottom sheet in the app, as they all use the same shared sheet. Dialogs keep their thin border, which was already drawn in the right place. The sliding tab bar was checked and is not affected.
+
 ## v1.0.0 (2026-10-31)
 
 SynapseCtrl is complete: everything for running your Synapse server from your phone is in this release.
