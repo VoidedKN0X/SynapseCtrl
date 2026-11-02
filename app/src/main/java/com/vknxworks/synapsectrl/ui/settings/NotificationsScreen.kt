@@ -61,6 +61,7 @@ import com.vknxworks.synapsectrl.ui.components.GroupChoice
 import com.vknxworks.synapsectrl.ui.components.GroupRow
 import com.vknxworks.synapsectrl.ui.components.GroupSwitch
 import com.vknxworks.synapsectrl.ui.components.ScreenTopBar
+import com.vknxworks.synapsectrl.ui.components.SecureScreen
 import com.vknxworks.synapsectrl.ui.components.relativeTime
 import com.vknxworks.synapsectrl.ui.components.rememberNotificationAccess
 import com.vknxworks.synapsectrl.ui.lock.AppLock
@@ -209,6 +210,8 @@ fun NotificationsScreen() {
                         }
                         is PushStatus.Unavailable -> PushNote(stringResource(R.string.push_unavailable)) {}
                         is PushStatus.Registered -> {
+                            // The push address holds the secret ntfy topic: kept out of screenshots while it's shown.
+                            SecureScreen()
                             GroupRow(
                                 stringResource(R.string.push_endpoint),
                                 st.endpoint,

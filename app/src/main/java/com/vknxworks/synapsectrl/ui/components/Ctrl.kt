@@ -75,6 +75,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.SecureFlagPolicy
 import com.vknxworks.synapsectrl.R
 import com.vknxworks.synapsectrl.container
 import com.vknxworks.synapsectrl.ui.lock.LocalOverLock
@@ -411,7 +413,11 @@ private fun windowAllowed(): Boolean {
     return !activity.isFinishing && !activity.isDestroyed
 }
 
-/** A dialog: surface fill, 26dp corners, 1dp border. Same slots as Material's AlertDialog. */
+/**
+ * A dialog: surface fill, 26dp corners, 1dp border. Same slots as Material's AlertDialog. A dialog is
+ * its own window, so with [secure] (a password or token is shown) it's kept out of screenshots, screen
+ * recordings and Recents itself, whatever "Hide in screenshots" says.
+ */
 @Composable
 fun CtrlAlertDialog(
     onDismissRequest: () -> Unit,
@@ -421,6 +427,7 @@ fun CtrlAlertDialog(
     icon: (@Composable () -> Unit)? = null,
     title: (@Composable () -> Unit)? = null,
     text: (@Composable () -> Unit)? = null,
+    secure: Boolean = false,
 ) {
     if (!windowAllowed()) return
     AlertDialog(
@@ -437,6 +444,7 @@ fun CtrlAlertDialog(
         titleContentColor = CtrlColors.Text,
         textContentColor = CtrlColors.Muted,
         tonalElevation = 0.dp,
+        properties = if (secure) DialogProperties(securePolicy = SecureFlagPolicy.SecureOn) else DialogProperties(),
     )
 }
 

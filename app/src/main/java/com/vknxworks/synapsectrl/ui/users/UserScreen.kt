@@ -423,6 +423,8 @@ private fun ResetPasswordDialog(userId: String, onDismiss: () -> Unit, onConfirm
     SecureScreen()
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
+        // The new password is shown in this dialog's own window: keep that window out of screenshots too.
+        secure = true,
         title = { Text(stringResource(R.string.reset_password)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

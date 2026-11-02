@@ -58,6 +58,7 @@ import com.vknxworks.synapsectrl.ui.components.GroupChoice
 import com.vknxworks.synapsectrl.ui.components.GroupRow
 import com.vknxworks.synapsectrl.ui.components.PillButton
 import com.vknxworks.synapsectrl.ui.components.ScreenTopBar
+import com.vknxworks.synapsectrl.ui.components.SecureScreen
 import com.vknxworks.synapsectrl.ui.lock.AppLock
 import com.vknxworks.synapsectrl.ui.theme.CtrlColors
 import com.vknxworks.synapsectrl.ui.theme.Gutter
@@ -91,6 +92,9 @@ fun InvitesScreen(createOnOpen: Boolean = false) {
     var error by remember { mutableStateOf<ApiError?>(null) }
     var reload by remember { mutableStateOf(0) }
     var pending by remember { mutableStateOf<Pending?>(if (createOnOpen) Pending.Create else null) }
+
+    // Registration tokens let anyone sign up on your server: never in screenshots or Recents.
+    SecureScreen()
 
     LaunchedEffect(server?.id, reload) {
         val client = active?.client ?: return@LaunchedEffect
@@ -232,6 +236,8 @@ private fun TokenDialog(
     val usesOk = uses.isEmpty() || (usesN != null && usesN > 0)
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
+        // Its own window, opened at once from the New invite shortcut: secure by itself, not only through the screen.
+        secure = true,
         title = { Text(if (existing == null) stringResource(R.string.new_token) else existing.token) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

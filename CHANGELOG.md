@@ -2,6 +2,23 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.2 (2026-11-02)
+
+A security and trust update: more screens with secrets are kept out of screenshots, and avatars are checked more strictly.
+
+### Security
+
+- **The Invites page is always kept out of screenshots, screen recordings and the recent apps view**, like server setup. Registration tokens let anyone sign up on your server, so they're treated like passwords now, whatever **Hide in screenshots** says.
+- **The new-token dialog and the reset-password dialog** are kept out of screenshots themselves too. A dialog is its own window on Android, so before this it could still show up in a screenshot when **Hide in screenshots** was off, even though the screen behind it was hidden.
+- **Your ntfy push address** is kept out of screenshots while it's shown on the Notifications page, because it holds the secret ntfy topic.
+- **Avatars are checked before they're loaded.** A profile picture address is set by other people (in their profile or a room), so SynapseCtrl now only loads one that is a normal Matrix media address. Anything else shows the first letter instead and never goes into a request to your server.
+
+### Project
+
+- New **SECURITY.md**: how to report a security problem privately, which versions get fixes, and the release key's fingerprint.
+- New **issue forms** for bug reports and feature requests, and a link to report security problems privately instead of in a public issue.
+- README: a step-by-step **Install** for people new to GitHub, a new **Is it safe to install?** section (open source, built by GitHub Actions, signed with the same key, every permission explained), **How SynapseCtrl is made**, and the full Ctrl series list. The empty Screenshots section is gone.
+
 ## v1.0.1 (2026-11-02)
 
 ### Fixed

@@ -189,6 +189,10 @@ fun <T> FilterRow(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> 
 
 // ---------- Avatars ----------
 
+/** A Matrix server name (host, IPv4, [IPv6], optional port) and a media ID ([A-Za-z0-9_-], per the spec). */
+private val MXC_SERVER = Regex("""^(\[[0-9A-Fa-f:.]+]|[A-Za-z0-9.-]+)(:[0-9]{1,5})?$""")
+private val MXC_MEDIA_ID = Regex("""^[A-Za-z0-9_-]+$""")
+
 /** Thumbnails already loaded, by mxc:// address, for this run of the app only (never written to disk). */
 private object AvatarCache {
     val cache = LruCache<String, ImageBitmap>(200)
@@ -208,6 +212,9 @@ fun Avatar(mxc: String?, label: String, size: Dp = 40.dp) {
         AvatarCache.cache.get(uri)?.let { value = it; return@produceState }
         if (uri in AvatarCache.missing) return@produceState
         val (server, mediaId) = uri.removePrefix("mxc://").split('/', limit = 2).let { if (it.size == 2) it[0] to it[1] else return@produceState }
+        // The address comes from profiles and room state other people set: only a real server name and media ID
+        // (no "..", "/" or other path tricks) is ever put into a request that carries the admin token.
+        if (!MXC_SERVER.matches(server) || !MXC_MEDIA_ID.matches(mediaId)) return@produceState
         val client = c.sessions.active.value?.client ?: return@produceState
         val bytes = client.bytes(Api.Media, listOf("thumbnail", server, mediaId), mapOf("width" to "96", "height" to "96", "method" to "crop"))
         val bmp = bytes?.let { runCatching { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }.getOrNull() }

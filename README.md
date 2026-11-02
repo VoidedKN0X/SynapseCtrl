@@ -23,10 +23,6 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Safe by design:** read-only mode per server, a confirmation for every change, the user or room ID typed in for deactivating, deleting a room and deleting old local media, app lock with **Confirm changes**, certificate pinning, **Hide in screenshots** and **Hide in recent apps**, and access tokens encrypted with the Android Keystore.
 - **Several servers**, and sign-in with an admin password (SynapseCtrl gets its own token and never stores the password) or a pasted access token.
 
-## Screenshots
-
-Coming soon.
-
 ## Requirements
 
 - Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
@@ -35,8 +31,8 @@ Coming soon.
 
 ## Install
 
-1. Download the latest `.apk` file from the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest).
-2. Open it on your phone. Android may ask you to allow installing apps from your browser or file manager.
+1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest). Scroll down to **Assets** and tap the file that ends in `.apk` (for example `SynapseCtrl-v1.0.2.apk`) to download it. The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
+2. Open the downloaded file. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings are kept.
 
 **Automatic updates:** on your phone, tap one of the buttons below.
@@ -58,6 +54,30 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 4. SynapseCtrl checks that the account is a server admin and shows the Synapse version. Choose whether to use **read-only mode**, and tap **Continue**.
 
 Your servers, **Settings** and **About** are on the **You** page: tap your profile picture at the top right of any tab. **Remove server** logs SynapseCtrl's access token out on the server first, so it stops working there too.
+
+## Is it safe to install?
+
+- **Open source.** All of SynapseCtrl's code is in this repo, under the GPL-3.0 licence. Anyone can read it.
+- **Built by GitHub Actions, not on a personal computer.** Every release on the Releases page is built from the code in this repo by [the build workflow](.github/workflows/build.yml), and you can see each build's log in the **Actions** tab.
+- **Always signed with the same release key.** Android refuses to install an update that's signed with a different key, so nobody else can replace SynapseCtrl on your phone with their own version. The [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) only accepts APKs signed with this key, and the build checks it too. The SHA-256 fingerprint of the signing certificate is:
+
+  ```
+  A3:28:7A:58:29:FD:9F:19:C0:BA:DB:48:5F:65:39:CF:0A:90:8E:B4:A7:87:C0:06:04:46:D0:60:4F:74:8C:E2
+  ```
+
+  Advanced users can compare it with [AppVerifier](https://github.com/soupslurpr/AppVerifier).
+
+**Permissions**
+
+| Permission | What SynapseCtrl uses it for |
+| --- | --- |
+| Internet (`INTERNET`) | Talking to the Synapse servers you add, and reading their public discovery addresses for the health checks. Nothing else can be reached. |
+| Fingerprint (`USE_BIOMETRIC`) | Unlocking the app lock with your fingerprint, if you turn that on. |
+| Notifications (`POST_NOTIFICATIONS`) | Notifications from the background checks. Only asked for when you turn those on. |
+
+Android's scheduler for background work (WorkManager) also adds its standard permissions to the app, so the background checks can wait for a network connection and keep running after the phone restarts. None of them gives access to your files, contacts, location, camera or microphone.
+
+What SynapseCtrl stores and sends is explained under [Privacy](#privacy).
 
 ## Create an admin account
 
@@ -101,12 +121,12 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server. One confirmation covers the next minute.
 - **Background checks** for notifications have to reach your servers while SynapseCtrl is locked. While they're on, your tokens are only encrypted with the Android Keystore, as without the app lock.
 
-**Hide in screenshots** and **Hide in recent apps** (in the same section, both off by default): the first keeps SynapseCtrl out of screenshots and screen recordings, the second shows a blank card in the recent-apps view. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
+**Hide in screenshots** and **Hide in recent apps** (in the same section, both off by default): the first keeps SynapseCtrl out of screenshots and screen recordings, the second shows a blank card in the recent-apps view. Server setup, the lock screen, the PIN screens, creating a user, resetting a password, the Invites page and your ntfy push address are always kept out of screenshots.
 
 ## Using SynapseCtrl safely
 
 - **Test destructive actions on a throwaway test user and test room first**, never on your own account or real rooms. SynapseCtrl doesn't offer admin, ban, lock or deactivate actions for the account it's signed in with.
-- **Deactivate**, **delete room** and **delete old local media** can't be undone: SynapseCtrl says what will happen and asks you to type the user ID, room ID or server name first. Everything else that changes something asks for a confirmation.
+- **Deactivate**, **delete room** and **delete old local media** can't be undone: SynapseCtrl says what will happen and asks you to type the user ID, room ID or server name first. Everything else that changes something asks for a confirmation, except quarantining or releasing a single file from its menu on a user's media page, which happens at once and can be undone the same way.
 - **Removing someone from a room** isn't in Synapse's admin API, so SynapseCtrl kicks them as your admin account. That only works when your account is in the room with enough power: use **Make me room admin** first.
 - **Delete old local media** goes by when a file was last opened, not uploaded, and Synapse has no dry run: the count SynapseCtrl shows first is an estimate from each user's media list.
 - **Server notices** need `server_notices` set up in `homeserver.yaml`; without it, Synapse's error is shown.
@@ -140,6 +160,10 @@ On ColorOS and other phones that close background apps, allow SynapseCtrl and nt
 
 - **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
 
+## How SynapseCtrl is made
+
+SynapseCtrl is a one-person project by VoidedKN0X (VKNXWorks). Much of the code is written with the help of AI (Claude, by Anthropic). I decide what the app does, review the changes and use the app myself. Every change is listed in the [changelog](CHANGELOG.md), and you can read every line of code here.
+
 ## Build from source
 
 You need [Android Studio](https://developer.android.com/studio), or JDK 17 and the Android SDK.
@@ -160,7 +184,9 @@ Or open the folder in Android Studio and press **Run** with your phone connected
 
 ## Support the project
 
-SynapseCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). Starring the repo and [reporting bugs](https://github.com/VoidedKN0X/SynapseCtrl/issues) helps too.
+SynapseCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). Starring the repo and [reporting bugs](https://github.com/VoidedKN0X/SynapseCtrl/issues/new/choose) helps too: pick **Bug report** or **Feature request** and fill in the form.
+
+Found a security problem? Please don't open a public issue; see [SECURITY.md](SECURITY.md).
 
 In the app, the **About** section at the bottom of the **You** page (tap your profile picture) has **Support SynapseCtrl** and **Report a bug** rows that open these pages.
 
@@ -184,9 +210,11 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
 | [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [RideCtrl](https://github.com/VoidedKN0X/RideCtrl) | Offline maintenance, fuel and mod log for your vehicles |
 | [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
 | **SynapseCtrl** (this app) | Administer your Matrix Synapse server |
 | [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
+| [WrtCtrl](https://github.com/VoidedKN0X/WrtCtrl) | Manage your OpenWrt router |
 
 ## License
 
@@ -194,4 +222,4 @@ SynapseCtrl is licensed under the [GNU General Public License v3.0](LICENSE). ©
 
 The bundled fonts are licensed under the SIL Open Font License 1.1: [Space Grotesk](https://github.com/floriankarsten/space-grotesk) (see `FONT-LICENSE-SpaceGrotesk.txt`) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (see `FONT-LICENSE-JetBrainsMono.txt`).
 
-SynapseCtrl is not affiliated with or endorsed by Element or the Matrix.org Foundation. Matrix and Synapse are trademarks of their owners.
+SynapseCtrl is an independent app and isn't made by or affiliated with Element (New Vector Ltd) or The Matrix.org Foundation. Matrix and Synapse are trademarks of their owners.
