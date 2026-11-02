@@ -189,8 +189,11 @@ fun <T> FilterRow(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> 
 
 // ---------- Avatars ----------
 
-/** A Matrix server name (host, IPv4, [IPv6], optional port) and a media ID ([A-Za-z0-9_-], per the spec). */
-private val MXC_SERVER = Regex("""^(\[[0-9A-Fa-f:.]+]|[A-Za-z0-9.-]+)(:[0-9]{1,5})?$""")
+/**
+ * A Matrix server name (host, IPv4, [IPv6], optional port) and a media ID ([A-Za-z0-9_-], per the spec).
+ * Host labels are dot-separated and never empty, so "." and ".." (which OkHttp resolves as path steps) can't match.
+ */
+private val MXC_SERVER = Regex("""^(\[[0-9A-Fa-f:.]+]|[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.?)(:[0-9]{1,5})?$""")
 private val MXC_MEDIA_ID = Regex("""^[A-Za-z0-9_-]+$""")
 
 /** Thumbnails already loaded, by mxc:// address, for this run of the app only (never written to disk). */
