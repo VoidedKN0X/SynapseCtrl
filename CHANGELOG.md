@@ -2,6 +2,12 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Project updates (2026-11-03)
+
+### Project
+
+- **README:** the Ctrl series list now includes SumCtrl, the offline calculator, unit converter and work-tools app. No app changes, so no new version.
+
 ## v1.0.3 (2026-11-03)
 
 The chat app in the Ctrl series is now called ChatCtrl.
