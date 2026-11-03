@@ -2,6 +2,15 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.3 (2026-11-03)
+
+The chat app in the Ctrl series is now called ChatCtrl.
+
+### Changed
+
+- **Invites and new accounts name ChatCtrl.** The invite you share from **Invites** now tells people to install **ChatCtrl** (from the CtrlF-Droid repo) or any Matrix app, like Element X. The note on **Create user** says the new user can sign in with ChatCtrl or any Matrix app.
+- **README:** the Ctrl series list links to ChatCtrl.
+
 ## v1.0.2 (2026-11-02)
 
 A security and trust update: more screens with secrets are kept out of screenshots, and avatars are checked more strictly.
