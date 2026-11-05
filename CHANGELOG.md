@@ -2,6 +2,20 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.4 (2026-11-05)
+
+A privacy and security tidy-up: one permission less, and the README lists everything SynapseCtrl can do on your phone.
+
+### Privacy
+
+- **One permission removed: "run foreground service" (`FOREGROUND_SERVICE`).** Android's background-work library added it, but SynapseCtrl never runs a foreground service: background checks and widget refreshes run as normal background work. Nothing changes in how notifications or the widget work.
+- **Less logging in release builds.** Verbose, debug and info log lines, from SynapseCtrl and from the libraries it uses, are now stripped from the app when it's built, so nothing can end up in the phone's system log through them.
+
+### Project
+
+- **Build checks:** every build now checks that the Gradle wrapper in the repo is the official one before running it, and the repo ignores `google-services.json` so a Google services file can never be committed by accident.
+- **README:** the permissions table lists every permission the app has, with the reason for each; the privacy section lists every site the app can open (only as links you tap) and says it's Google-free; the Ctrl series list now has all 28 apps, including CallCtrl, ClockCtrl, ContactCtrl, DateCtrl, LijnCtrl, MailCtrl, RecorderCtrl and TextCtrl.
+
 ## Project updates (2026-11-03)
 
 ### Project

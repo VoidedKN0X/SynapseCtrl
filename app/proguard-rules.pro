@@ -12,3 +12,10 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 -dontwarn javax.annotation.**
+
+# Release builds drop verbose, debug and info logging, from SynapseCtrl and from its libraries.
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

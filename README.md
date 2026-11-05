@@ -31,7 +31,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Install
 
-1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest). Scroll down to **Assets** and tap the file that ends in `.apk` (for example `SynapseCtrl-v1.0.2.apk`) to download it. The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
+1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest). Scroll down to **Assets** and tap the file that ends in `.apk` (for example `SynapseCtrl-v1.0.4.apk`) to download it. The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
 2. Open the downloaded file. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings are kept.
 
@@ -74,8 +74,12 @@ Your servers, **Settings** and **About** are on the **You** page: tap your profi
 | Internet (`INTERNET`) | Talking to the Synapse servers you add, and reading their public discovery addresses for the health checks. Nothing else can be reached. |
 | Fingerprint (`USE_BIOMETRIC`) | Unlocking the app lock with your fingerprint, if you turn that on. |
 | Notifications (`POST_NOTIFICATIONS`) | Notifications from the background checks. Only asked for when you turn those on. |
+| Network state (`ACCESS_NETWORK_STATE`) | Running background checks and widget refreshes only when the phone has a connection. It never reads the Wi-Fi name. |
+| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Scheduling the background checks and widget refreshes again after the phone restarts. Added by Android's scheduler for background work (WorkManager). |
+| Keep awake (`WAKE_LOCK`) | Letting a background check finish while the screen is off. Added by WorkManager. |
+| `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | An internal permission only SynapseCtrl itself holds (added by AndroidX), so other apps can't send to its private receivers. |
 
-Android's scheduler for background work (WorkManager) also adds its standard permissions to the app, so the background checks can wait for a network connection and keep running after the phone restarts. None of them gives access to your files, contacts, location, camera or microphone.
+That's the full list. SynapseCtrl has no access to your files, contacts, location, camera or microphone, and doesn't run a foreground service.
 
 What SynapseCtrl stores and sends is explained under [Privacy](#privacy).
 
@@ -158,7 +162,8 @@ On ColorOS and other phones that close background apps, allow SynapseCtrl and nt
 
 **Telemetry-free.** SynapseCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the Synapse servers you add, and refuses to connect anywhere else. The health checks also read your server's public discovery endpoints (on your server name and the hosts its `.well-known` files name), over HTTPS, without your token. With push turned on, the ntfy app on your phone delivers wake-up calls to SynapseCtrl; SynapseCtrl itself never connects to your ntfy server. See [PRIVACY.md](PRIVACY.md).
 
-- **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
+- **Links:** the Support, Report a bug, Source code and Licence rows in About open github.com or gnu.org in your browser, and **Install ntfy** on the Notifications page (shown when ntfy is missing) opens ntfy's page on f-droid.org. The app itself never contacts these sites.
+- **Google-free:** no Google Play services, Firebase or other Google code, and nothing is sent to Google.
 
 ## How SynapseCtrl is made
 
@@ -199,21 +204,29 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | [AdCtrl](https://github.com/VoidedKN0X/AdCtrl) | Control your AdGuard Home DNS server |
 | [ArrCtrl](https://github.com/VoidedKN0X/ArrCtrl) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
 | [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
+| [CallCtrl](https://github.com/VoidedKN0X/CallCtrl) | Phone app: dialer, call history and in-call screen |
 | [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) | Matrix chat client for matrix.org and self-hosted Synapse |
+| [ClockCtrl](https://github.com/VoidedKN0X/ClockCtrl) | Alarms, timers, stopwatch and world clock |
+| [ContactCtrl](https://github.com/VoidedKN0X/ContactCtrl) | Contacts: browse, edit, import and export |
 | [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
+| [DateCtrl](https://github.com/VoidedKN0X/DateCtrl) | Calendar for the calendars on your phone and your accounts |
 | [FilesCtrl](https://github.com/VoidedKN0X/FilesCtrl) | File manager with NFS, SMB, SFTP, FTP and WebDAV |
 | [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
 | [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
 | [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [LijnCtrl](https://github.com/VoidedKN0X/LijnCtrl) | Live De Lijn bus and tram departures |
+| [MailCtrl](https://github.com/VoidedKN0X/MailCtrl) | Email for Gmail and Proton Mail |
 | [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
 | [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
 | [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [RecorderCtrl](https://github.com/VoidedKN0X/RecorderCtrl) | Private, offline voice recorder |
 | [RideCtrl](https://github.com/VoidedKN0X/RideCtrl) | Offline maintenance, fuel and mod log for your vehicles |
 | [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
 | [SumCtrl](https://github.com/VoidedKN0X/SumCtrl) | Offline calculator, unit converter and work tools |
 | **SynapseCtrl** (this app) | Administer your Matrix Synapse server |
+| [TextCtrl](https://github.com/VoidedKN0X/TextCtrl) | Private SMS and MMS messaging |
 | [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
 | [WrtCtrl](https://github.com/VoidedKN0X/WrtCtrl) | Manage your OpenWrt router |
 

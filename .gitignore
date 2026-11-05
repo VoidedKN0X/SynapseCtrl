@@ -16,3 +16,6 @@ captures/
 *.p12
 keystore.properties
 !debug.keystore
+
+# Never Google services config
+google-services.json
