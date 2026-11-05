@@ -84,6 +84,12 @@
                 android:resource="@xml/widget_status_info" />
         </receiver>
 
+        <!-- AndroidX's profile installer receiver lets other apps ask SynapseCtrl to write or skip its
+             ART profile; it isn't needed, so leave it out. -->
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            tools:node="remove" />
+
         <!-- WorkManager's diagnostics receiver (debug dumps over adb) isn't needed; leave it out. -->
         <receiver
             android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"

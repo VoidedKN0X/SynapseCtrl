@@ -2,6 +2,22 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.5 (2026-11-05)
+
+Plain HTTP now works over Tailscale, and one more way for other apps to reach into SynapseCtrl is gone.
+
+### Fixed
+
+- **Plain HTTP works over Tailscale.** SynapseCtrl only allows `http://` for addresses on your own network, but it didn't count Tailscale as your own network, so an address like `http://100.101.102.103:8008` or `http://synapse.tailnet-name.ts.net:8008` was refused even with **Allow plain HTTP for this server** switched on. Tailscale's `100.64.0.0/10` addresses and MagicDNS names ending in `.ts.net` now count as private (its `fd7a:115c:a1e0::` IPv6 addresses already did). You still have to switch on plain HTTP for that server and confirm the warning, and a name must still point to a private or Tailscale address, or SynapseCtrl won't send your access token to it.
+
+### Security
+
+- **Other apps can no longer poke SynapseCtrl's start-up profile.** An AndroidX library added a receiver that lets other apps ask SynapseCtrl to write or skip its start-up performance profile. SynapseCtrl doesn't need it, so it's removed. Nothing changes in how the app works.
+
+### Project
+
+- **README:** says plain HTTP works over Tailscale, with example addresses.
+
 ## v1.0.4 (2026-11-05)
 
 A privacy and security tidy-up: one permission less, and the README lists everything SynapseCtrl can do on your phone.

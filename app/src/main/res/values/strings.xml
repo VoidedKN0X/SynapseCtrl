@@ -39,7 +39,7 @@
     <string name="address_resolves">Connects to %1$s, and only to this address</string>
     <string name="address_only_this">Without http://, SynapseCtrl uses HTTPS. SynapseCtrl only ever connects to the address you enter here.</string>
     <string name="address_invalid">That doesn\'t look like a web address.</string>
-    <string name="address_http_public">Plain http:// is only allowed for addresses on your own network (like 192.168.x.x or synapse.lan), because SynapseCtrl sends your admin access token with every request. Use https:// for this address.</string>
+    <string name="address_http_public">Plain http:// is only allowed for addresses on your own network (like 192.168.x.x, synapse.lan or a Tailscale address), because SynapseCtrl sends your admin access token with every request. Use https:// for this address.</string>
     <string name="field_name">Name (optional)</string>
     <string name="field_name_hint">Defaults to the server name, like vkhub.org</string>
     <string name="field_username">Admin username</string>
@@ -48,7 +48,7 @@
     <string name="hide_password">Hide password</string>
     <string name="http_switch">Allow plain HTTP for this server</string>
     <string name="http_switch_subtitle">Your admin access token travels unencrypted on your network</string>
-    <string name="http_switch_footer">Only for addresses on your own network. A name like synapse.lan must also point to a private address, or SynapseCtrl won\'t connect. HTTPS is safer.</string>
+    <string name="http_switch_footer">Only for addresses on your own network or your Tailscale tailnet. A name like synapse.lan or synapse.tailnet-name.ts.net must also point to a private address, or SynapseCtrl won\'t connect. HTTPS is safer.</string>
     <string name="http_warning_title">Use plain HTTP?</string>
     <string name="http_warning_body">SynapseCtrl will talk to %1$s without encryption. Every request carries your admin access token, which can do anything on your server, so anyone who can watch your network could take it over. Only do this on a network you trust.</string>
     <string name="http_allow">Allow HTTP</string>

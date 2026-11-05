@@ -31,7 +31,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Install
 
-1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest). Scroll down to **Assets** and tap the file that ends in `.apk` (for example `SynapseCtrl-v1.0.4.apk`) to download it. The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
+1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest). Scroll down to **Assets** and tap the file that ends in `.apk` (for example `SynapseCtrl-v1.0.5.apk`) to download it. The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
 2. Open the downloaded file. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings are kept.
 
@@ -104,7 +104,7 @@ location /_synapse/admin {
 }
 ```
 
-Then point SynapseCtrl straight at Synapse's LAN address, like `http://192.168.1.20:8008`, and use it at home or over your VPN. Plain HTTP is allowed for addresses on your own network, after you switch it on for that server. Synapse must listen on that address: in `homeserver.yaml`, the HTTP listener with the `client` resource needs `bind_addresses` that include the LAN interface (for example `['0.0.0.0']`).
+Then point SynapseCtrl straight at Synapse's LAN address, like `http://192.168.1.20:8008`, and use it at home or over your VPN. Plain HTTP is allowed for addresses on your own network, after you switch it on for that server. That includes [Tailscale](https://tailscale.com): its `100.x.y.y` addresses (100.64.0.0/10), its `fd7a:115c:a1e0::` IPv6 addresses and MagicDNS names ending in `.ts.net` count as your own network too, so `http://100.101.102.103:8008` or `http://synapse.tailnet-name.ts.net:8008` works. A name must still point to a private or Tailscale address, or SynapseCtrl won't send your token to it. Synapse must listen on that address: in `homeserver.yaml`, the HTTP listener with the `client` resource needs `bind_addresses` that include the LAN interface (for example `['0.0.0.0']`).
 
 If SynapseCtrl says the server answers but not on `/_synapse/admin`, it's talking to an address where the admin API is blocked: use the LAN address instead. SynapseCtrl never switches addresses on its own.
 

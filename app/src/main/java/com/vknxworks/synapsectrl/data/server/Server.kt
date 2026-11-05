@@ -95,13 +95,15 @@ object ServerAddress {
     /** scheme://host:port, the unit the host allowlist works on. */
     fun origin(url: HttpUrl): String = "${url.scheme}://${url.host.lowercase()}:${url.port}"
 
-    private val LOCAL_SUFFIXES = listOf(".lan", ".local", ".home.arpa", ".internal")
+    private val LOCAL_SUFFIXES = listOf(".lan", ".local", ".home.arpa", ".internal", ".ts.net")
 
     /**
-     * True for addresses that can only be on the user's own network: private and link-local IPv4
-     * (10/8, 172.16/12, 192.168/16, 169.254/16), unique-local and link-local IPv6 (fc00::/7, fe80::/10),
-     * single-label names and the .lan, .local, .home.arpa and .internal names. A host name must also
-     * resolve to a private address before plain HTTP is used (see [isPrivateAddress]).
+     * True for addresses that can only be on the user's own network or tailnet: private and
+     * link-local IPv4 (10/8, 172.16/12, 192.168/16, 169.254/16), Tailscale's 100.64/10, unique-local
+     * and link-local IPv6 (fc00::/7, which includes Tailscale's fd7a:115c:a1e0::/48, and fe80::/10),
+     * single-label names and the .lan, .local, .home.arpa, .internal and Tailscale MagicDNS .ts.net
+     * names. A host name must also resolve to a private address before plain HTTP is used
+     * (see [isPrivateAddress]).
      */
     fun isPrivateHost(host: String): Boolean {
         val h = host.lowercase().trim('[', ']')
@@ -115,6 +117,7 @@ object ServerAddress {
         if (addr is Inet6Address) {
             val first = b[0].toInt() and 0xFF
             val second = b[1].toInt() and 0xFF
+            // fc00::/7 (unique-local, which includes Tailscale's fd7a:115c:a1e0::/48) and fe80::/10.
             return (first and 0xFE) == 0xFC || (first == 0xFE && (second and 0xC0) == 0x80)
         }
         if (b.size != 4) return false
@@ -123,7 +126,9 @@ object ServerAddress {
         return a0 == 10 ||
             (a0 == 172 && a1 in 16..31) ||
             (a0 == 192 && a1 == 168) ||
-            (a0 == 169 && a1 == 254)
+            (a0 == 169 && a1 == 254) ||
+            // 100.64.0.0/10: carrier-grade NAT space, where Tailscale gives every device its address.
+            (a0 == 100 && a1 in 64..127)
     }
 
     private val IPV4 = Regex("""^\d{1,3}(\.\d{1,3}){3}$""")
