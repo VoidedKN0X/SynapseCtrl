@@ -2,6 +2,12 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.7 (2026-11-05)
+
+### Changed
+
+- **Needs Android 15 or newer.** Android 13 no longer gets security updates and Android 14's updates end in early 2027, so SynapseCtrl now supports Android 15, 16 and 17 only. On older phones the version you have keeps working, but it won't get updates.
+
 ## v1.0.6 (2026-11-05)
 
 ### Security

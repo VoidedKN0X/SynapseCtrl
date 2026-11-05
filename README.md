@@ -2,7 +2,7 @@
 
 **Administer your self-hosted Matrix Synapse server from your phone.**
 
-[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/SynapseCtrl?label=download)](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
+[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/SynapseCtrl?label=download)](https://github.com/VoidedKN0X/SynapseCtrl/releases/latest) ![Android 15+](https://img.shields.io/badge/Android-15%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
 
 SynapseCtrl is an Android admin app for [Synapse](https://github.com/element-hq/synapse), the Matrix homeserver. It uses Synapse's admin API to manage users, invites, rooms, media, reports and server health. It's an admin tool, not a chat client: for chatting, use [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) or any other Matrix app.
 
@@ -25,7 +25,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Requirements
 
-- Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
+- Android 15 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
 - A Synapse server and an account that is a **server admin** (see [Create an admin account](#create-an-admin-account))
 - **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
 
