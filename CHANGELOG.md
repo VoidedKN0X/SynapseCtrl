@@ -2,6 +2,19 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Project updates (2026-11-05, workflows)
+
+No new app version: these changes are to the repo's build workflows only.
+
+### Project
+
+- **Signed build provenance:** every release from now on gets a GitHub build attestation, signed through Sigstore, which proves the APK was built by this repo's workflow from the tagged commit. You can check it with `gh attestation verify`.
+- **Checksum in the release notes:** the release notes end with the APK's SHA-256, so you can check a download before installing it.
+- **Least privilege:** the workflows get no permissions by default; each job gets only what it needs, and only the release job can write to the repo.
+- **Workflow security check:** a new zizmor check runs on every change to the workflows, offline, with zizmor pinned by its checksum.
+- **Code scanning:** CodeQL analyses the app's code every week and on every app change; results go to the repo's Security tab.
+- **Dependency checksums:** a new manually started workflow writes `gradle/verification-metadata.xml`, the list of sha256 checksums every library and build plugin download is checked against.
+
 ## v1.0.5 (2026-11-05)
 
 Plain HTTP now works over Tailscale, and one more way for other apps to reach into SynapseCtrl is gone.
