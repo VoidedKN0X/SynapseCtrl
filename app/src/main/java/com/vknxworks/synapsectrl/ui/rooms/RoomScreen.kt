@@ -307,6 +307,7 @@ private fun KickDialog(userId: String, onDismiss: () -> Unit, onConfirm: (String
     var reason by remember { mutableStateOf("") }
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
+        guard = true,
         title = { Text(stringResource(R.string.kick_title, userId)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

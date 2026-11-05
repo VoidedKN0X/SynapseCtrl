@@ -309,6 +309,7 @@ fun TypedConfirmDialog(
     val matches = typed.trim() == expected
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
+        guard = true,
         title = { Text(title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

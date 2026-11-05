@@ -1,5 +1,6 @@
 package com.vknxworks.synapsectrl
 
+import com.vknxworks.synapsectrl.ui.lock.GuardWindow
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -61,6 +62,8 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
             val covered = lockCovering(c.vault)
+            // No overlays over the lock and PIN screens, and their content hidden from accessibility misuse.
+            GuardWindow(covered, sensitive = true)
             SynapseCtrlTheme(dark) {
                 Box(Modifier.fillMaxSize()) {
                     // The app stays underneath (so nothing you typed is lost), hidden from TalkBack too.

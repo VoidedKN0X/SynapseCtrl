@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- Notifications from the background checks; asked for only when you turn them on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Hides other apps' floating windows over the lock and PIN screens and over delete, kick, remove-server,
+         certificate and plain-HTTP confirmations only. Install-time permission, no prompt. -->
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
     <!-- WorkManager adds this for long-running foreground work, which SynapseCtrl never starts. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
@@ -19,11 +22,15 @@
         </intent>
     </queries>
 
+    <!-- intentMatchingFlags (Android 16+): other apps can only reach SynapseCtrl's exported components with an
+         intent that matches their filters (the launcher, the launcher shortcuts' actions, and ntfy's UnifiedPush
+         broadcasts and bind). -->
     <application
         android:name=".SynapseCtrlApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
+        android:intentMatchingFlags="enforceIntentFilter"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -40,6 +47,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- The launcher shortcuts' actions (res/xml/shortcuts.xml), so they match a filter. -->
+            <intent-filter>
+                <action android:name="com.vknxworks.synapsectrl.INVITE" />
+                <action android:name="com.vknxworks.synapsectrl.USERS" />
+                <action android:name="com.vknxworks.synapsectrl.REPORTS" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
                 android:name="android.app.shortcuts"

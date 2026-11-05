@@ -21,6 +21,7 @@ fun ConfirmDialog(
 ) {
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
+        guard = danger,
         icon = if (icon != null) {
             { Icon(icon, null, tint = if (danger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) }
         } else {

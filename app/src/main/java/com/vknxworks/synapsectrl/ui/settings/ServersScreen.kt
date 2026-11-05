@@ -114,6 +114,7 @@ fun ServersScreen() {
     removing?.let { server ->
         CtrlAlertDialog(
             onDismissRequest = { removing = null },
+            guard = true,
             title = { Text(stringResource(R.string.remove_server_title, server.name)) },
             text = { Text(stringResource(R.string.remove_server_body)) },
             confirmButton = {

@@ -67,6 +67,12 @@ Your servers, **Settings** and **About** are on the **You** page: tap your profi
 
   Advanced users can compare it with [AppVerifier](https://github.com/soupslurpr/AppVerifier).
 
+**Check a download.** Every release is built and published by GitHub Actions, never on a personal computer:
+
+- The release notes end with the APK's **SHA-256** checksum. Compare it with `sha256sum SynapseCtrl-vX.Y.Z.apk` (or `Get-FileHash` on Windows).
+- Each release APK has a signed **build provenance attestation**. With the [GitHub CLI](https://cli.github.com/), `gh attestation verify SynapseCtrl-vX.Y.Z.apk -R VoidedKN0X/SynapseCtrl` proves it was built by this repo's workflow from the tagged commit.
+- The signing-certificate fingerprint above stays the same for every release.
+
 **Permissions**
 
 | Permission | What SynapseCtrl uses it for |
@@ -78,6 +84,7 @@ Your servers, **Settings** and **About** are on the **You** page: tap your profi
 | Run at startup (`RECEIVE_BOOT_COMPLETED`) | Scheduling the background checks and widget refreshes again after the phone restarts. Added by Android's scheduler for background work (WorkManager). |
 | Keep awake (`WAKE_LOCK`) | Letting a background check finish while the screen is off. Added by WorkManager. |
 | `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | An internal permission only SynapseCtrl itself holds (added by AndroidX), so other apps can't send to its private receivers. |
+| Hide other apps' floating windows over the PIN screen | While the lock or PIN screen, or a delete, deactivate, kick, remove-server, certificate or plain-HTTP confirmation, is showing, other apps' floating windows (chat heads, overlays) are hidden over it, so nothing can cover or imitate it. No prompt; overlays work as usual everywhere else. |
 
 That's the full list. SynapseCtrl has no access to your files, contacts, location, camera or microphone, and doesn't run a foreground service.
 
@@ -186,6 +193,8 @@ You need [Android Studio](https://developer.android.com/studio), or JDK 17 and t
 3. The APK is in `app/build/outputs/apk/debug/`. Copy it to your phone and install it.
 
 Or open the folder in Android Studio and press **Run** with your phone connected.
+
+**Dependency verification.** Every library and build plugin download is checked against the sha256 checksums in `gradle/verification-metadata.xml`, and the build fails on any mismatch. When you change a dependency, a plugin or the Gradle version, run the **Dependency verification metadata** workflow (Actions tab, *Run workflow*), check the diff of the file it prints and commit it in the same push.
 
 ## Support the project
 

@@ -12,6 +12,10 @@ Android admin app for a self-hosted Matrix Synapse server (users, invites, rooms
 - Destructive actions (deactivate/erase user, delete room, delete local media) show what will happen and need the user or room ID typed in. Test them on a throwaway test user and test room, never on the owner's own account or real rooms.
 - CI runs a Google-free dependency audit on every build; keep it passing.
 
+## Dependency verification
+
+Gradle checks every library and plugin download against the sha256 checksums in `gradle/verification-metadata.xml` (checksums only, no PGP). When a dependency, plugin or the Gradle version changes, start the `verification-metadata.yml` workflow (`gh api -X POST repos/VoidedKN0X/SynapseCtrl/actions/workflows/verification-metadata.yml/dispatches -f ref=main`), take the file from its log (gzipped and base64-encoded between the BEGIN/END markers), check the diff (only Maven Central, Google's Maven and the Gradle plugin portal) and commit it in the same push. Never turn verification off or make it lenient.
+
 ## Releasing
 
 - A release is published only when `versionName` in `app/build.gradle.kts` is bumped. Bump `versionCode` by 1 at the same time.

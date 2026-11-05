@@ -1,5 +1,6 @@
 package com.vknxworks.synapsectrl.ui.components
 
+import com.vknxworks.synapsectrl.ui.lock.GuardWindow
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
@@ -428,11 +429,16 @@ fun CtrlAlertDialog(
     title: (@Composable () -> Unit)? = null,
     text: (@Composable () -> Unit)? = null,
     secure: Boolean = false,
+    // Protects a destructive or security confirmation from other apps' overlays while it shows.
+    guard: Boolean = false,
 ) {
     if (!windowAllowed()) return
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
+        confirmButton = {
+            GuardWindow(guard)
+            confirmButton()
+        },
         modifier = modifier.border(CardBorder, CtrlShapes.Hero),
         dismissButton = dismissButton,
         icon = icon,

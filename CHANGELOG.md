@@ -2,6 +2,19 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.6 (2026-11-05)
+
+### Security
+
+- **No overlays over the lock screen and confirmations.** While the lock screen, a PIN screen (turning the lock on or off, changing the PIN, confirming a change), "Forgot PIN?", or a confirmation to delete, deactivate, erase, quarantine, kick, remove a server, trust a certificate or use plain HTTP is showing, other apps' floating windows (chat heads, screen overlays) are hidden over it, so no other app can cover it or put a fake screen on top. They come back as soon as that screen closes, and work as usual everywhere else. This uses a new install-time permission, "Hide other apps' floating windows"; there's no prompt.
+- **PIN screens hidden from accessibility misuse.** On Android 14 and newer, the lock and PIN screens are marked as sensitive, so apps that misuse accessibility access can't read them. Real accessibility tools such as TalkBack keep working. Sign-in and other password fields aren't marked, so password managers keep filling them as before.
+- **Stricter intents from other apps.** On Android 16 and newer, other apps can only reach SynapseCtrl with an intent that really matches it. The New invite, Users and Reports launcher shortcuts are now declared for this, so they, the widget and push through ntfy work as before.
+
+### Project
+
+- **Checked dependencies:** every library and build plugin download is now checked against sha256 checksums in `gradle/verification-metadata.xml`, and the build fails on any mismatch.
+- **Verifiable releases:** this is the first release with a signed build provenance attestation and the APK's SHA-256 in the release notes. The README explains how to check a download with `gh attestation verify`.
+
 ## Project updates (2026-11-05, workflows)
 
 No new app version: these changes are to the repo's build workflows only.

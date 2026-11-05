@@ -41,6 +41,7 @@ fun CertTrustDialog(cert: CertInfo, changed: Boolean, onTrust: () -> Unit, onCan
     val cs = MaterialTheme.colorScheme
     CtrlAlertDialog(
         onDismissRequest = onCancel,
+        guard = true,
         icon = { Icon(Icons.Outlined.VerifiedUser, null) },
         title = { Text(stringResource(if (changed) R.string.cert_changed_title else R.string.cert_title)) },
         text = {
@@ -73,6 +74,7 @@ fun CertTrustDialog(cert: CertInfo, changed: Boolean, onTrust: () -> Unit, onCan
 fun HttpWarningDialog(host: String, onAllow: () -> Unit, onCancel: () -> Unit) {
     CtrlAlertDialog(
         onDismissRequest = onCancel,
+        guard = true,
         icon = { Icon(Icons.Outlined.Warning, null, tint = MaterialTheme.colorScheme.error) },
         title = { Text(stringResource(R.string.http_warning_title)) },
         text = { Text(stringResource(R.string.http_warning_body, host)) },
