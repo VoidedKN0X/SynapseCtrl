@@ -2,6 +2,20 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.9 (2026-11-13)
+
+A security and privacy check-up. Nothing works differently, and you don't need to sign in again.
+
+### Security
+
+- **Access tokens in the phone's security chip:** on phones with StrongBox (a separate security chip, such as Titan M on Pixels), the key that encrypts your saved access tokens is now made inside that chip, and falls back to the normal Android Keystore on phones without one. This applies when the key is first made (a new install, or after clearing SynapseCtrl's data); tokens you already saved stay encrypted with the key they have.
+- **Health checks read only small answers:** the Overview's health checks follow your server's well-known files to other hosts, so they now read at most 256 KB from each answer (real ones are a few hundred bytes). A host that sends more simply fails that check instead of filling the phone's memory.
+- **Checked build tools:** the build now also checks the SHA-256 of the Gradle build tool it downloads, as it already did for every library.
+
+### Performance
+
+- Reading a saved token no longer opens the Android Keystore again each time, so background checks and the widget connect a little sooner.
+
 ## v1.0.8 (2026-11-12)
 
 ### Changed

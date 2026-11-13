@@ -61,9 +61,18 @@ class HealthChecker {
 
     private class Fetched(val code: Int, val json: JsonObject?)
 
+    private companion object {
+        const val MAX_BODY = 256L * 1024
+    }
+
     private suspend fun fetch(url: HttpUrl): Fetched = withContext(Dispatchers.IO) {
         http.newCall(Request.Builder().url(url).get().header("Accept", "application/json").build()).execute().use { r ->
-            val text = runCatching { r.body?.string().orEmpty() }.getOrDefault("")
+            // These answers can come from any host a well-known file names, so only the first 256 KB is read
+            // (discovery files and version answers are a few hundred bytes); anything bigger fails the check.
+            val text = runCatching {
+                val source = r.body?.source() ?: return@runCatching ""
+                if (source.request(MAX_BODY + 1)) "" else source.buffer.readUtf8()
+            }.getOrDefault("")
             Fetched(r.code, runCatching { ApiJson.parseToJsonElement(text) as? JsonObject }.getOrNull())
         }
     }
