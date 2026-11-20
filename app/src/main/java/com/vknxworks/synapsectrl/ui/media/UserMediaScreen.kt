@@ -36,6 +36,7 @@ import com.vknxworks.synapsectrl.R
 import com.vknxworks.synapsectrl.container
 import com.vknxworks.synapsectrl.data.admin.LocalMedia
 import com.vknxworks.synapsectrl.data.admin.deleteMedia
+import com.vknxworks.synapsectrl.data.overview.MediaTotalsCache
 import com.vknxworks.synapsectrl.data.admin.setMediaQuarantined
 import com.vknxworks.synapsectrl.data.admin.userMedia
 import com.vknxworks.synapsectrl.data.api.ApiError
@@ -180,7 +181,11 @@ fun UserMediaScreen(userId: String) {
             onDismiss = { deleting = null },
             onConfirm = {
                 deleting = null
-                actions.run(context.getString(R.string.done_deleted), after = { reload++ }) { client.deleteMedia(serverName, m.mediaId) }
+                actions.run(context.getString(R.string.done_deleted), after = { reload++ }) {
+                    client.deleteMedia(serverName, m.mediaId)
+                    // The Overview's media usage is no longer right: add it up again at its next refresh.
+                    MediaTotalsCache.forget(client.server.id)
+                }
             },
         )
     }

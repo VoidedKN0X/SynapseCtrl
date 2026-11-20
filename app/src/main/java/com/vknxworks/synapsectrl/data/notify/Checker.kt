@@ -50,7 +50,8 @@ class Checker(private val context: Context, private val health: HealthChecker) {
     suspend fun check(server: Server, client: SynapseClient, settings: NotifySettings, prev: CheckState, many: Boolean): CheckResult {
         val now = System.currentTimeMillis()
         val summary = try {
-            loadSummary(client, if (settings.on(NotifyEvent.HEALTH)) health else null)
+            // Media usage is only added up when its notification is on; nothing else here reads it.
+            loadSummary(client, if (settings.on(NotifyEvent.HEALTH)) health else null, includeMedia = settings.on(NotifyEvent.MEDIA))
         } catch (e: ApiError) {
             return unreachable(server, settings, prev, e, now)
         }

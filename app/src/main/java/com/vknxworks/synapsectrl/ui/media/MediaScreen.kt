@@ -37,6 +37,7 @@ import com.vknxworks.synapsectrl.data.admin.MediaStats
 import com.vknxworks.synapsectrl.data.admin.deleteLocalMedia
 import com.vknxworks.synapsectrl.data.admin.mediaStats
 import com.vknxworks.synapsectrl.data.admin.purgeRemoteMedia
+import com.vknxworks.synapsectrl.data.overview.MediaTotalsCache
 import com.vknxworks.synapsectrl.data.admin.setMediaQuarantined
 import com.vknxworks.synapsectrl.data.admin.userMedia
 import com.vknxworks.synapsectrl.data.api.ApiError
@@ -277,6 +278,8 @@ fun MediaScreen() {
                 pending = null
                 actions.run(null, after = { reload++ }) {
                     val n = client.deleteLocalMedia(System.currentTimeMillis() - localDays * DAY, localSize, keepProfiles).total
+                    // The Overview's media usage is no longer right: add it up again at its next refresh.
+                    MediaTotalsCache.forget(client.server.id)
                     actions.say(context.getString(R.string.done_media_deleted, n))
                 }
             },

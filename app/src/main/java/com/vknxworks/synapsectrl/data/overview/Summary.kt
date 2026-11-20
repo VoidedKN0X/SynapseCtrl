@@ -13,8 +13,10 @@ import com.vknxworks.synapsectrl.data.api.SynapseClient
 import com.vknxworks.synapsectrl.data.health.HealthCheck
 import com.vknxworks.synapsectrl.data.health.HealthChecker
 import com.vknxworks.synapsectrl.data.health.HealthState
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.util.concurrent.ConcurrentHashMap
 
 /** The numbers on the Overview. Null means that part couldn't be loaded. */
 data class Summary(
@@ -34,6 +36,9 @@ data class Summary(
     val loadedAt: Long = System.currentTimeMillis(),
 ) {
     val failingHealth: List<HealthCheck> get() = health.filter { it.state == HealthState.FAIL }
+
+    /** This summary with [media] as its media usage (null: not loaded). */
+    fun withMedia(media: MediaTotals?): Summary = copy(mediaBytes = media?.bytes, mediaCount = media?.count, mediaPartial = media?.partial == true)
 }
 
 /** Something on the Overview that needs a look, most important first. */
@@ -57,33 +62,88 @@ object Attention {
 }
 
 /**
- * Loads everything the Overview shows, with reads only: user counts (v3 users with limit 1, which
- * still reports the total), the room count, open event reports, media usage summed over the users'
- * media statistics, failing federation destinations, background updates and the health checks. Each
- * part is loaded on its own, so one failing part doesn't hide the rest; who's signed in and admin
- * access must work, or the whole summary fails with that error.
+ * Local media usage, added up over the users' media statistics. [partial]: there were more users with
+ * media than SynapseCtrl added up.
  */
-suspend fun loadSummary(client: SynapseClient, health: HealthChecker?): Summary = coroutineScope {
+data class MediaTotals(val bytes: Long, val count: Long, val partial: Boolean, val loadedAt: Long = System.currentTimeMillis())
+
+/**
+ * The last media totals per server, in memory only. Adding them up takes one request per 100 users
+ * with media, one after the other, and the result changes slowly, so the Overview and the background
+ * checks share a total for [MAX_AGE_MS] instead of adding it up again on every refresh. Deleting
+ * media in the app drops the server's total ([forget]), and so does pulling down to refresh.
+ */
+object MediaTotalsCache {
+    const val MAX_AGE_MS = 10 * 60_000L
+
+    private val totals = ConcurrentHashMap<String, MediaTotals>()
+
+    /** One entry per server and address: a server whose address was changed starts over. */
+    fun keyFor(client: SynapseClient): String = client.server.id + "|" + client.server.url
+
+    /** The total for [key] when it's younger than [MAX_AGE_MS]. */
+    fun fresh(key: String): MediaTotals? = totals[key]?.takeIf { System.currentTimeMillis() - it.loadedAt in 0L until MAX_AGE_MS }
+
+    /** The last total for [key], however old. */
+    fun last(key: String): MediaTotals? = totals[key]
+
+    fun put(key: String, value: MediaTotals) {
+        totals[key] = value
+    }
+
+    /** Drops what's kept for the server [serverId] (it was removed, or media was just deleted on it). */
+    fun forget(serverId: String) {
+        totals.keys.removeAll { it.startsWith("$serverId|") }
+    }
+}
+
+/**
+ * Adds up the users' media statistics, biggest users first: pages of 100, at most 20 pages. Null when
+ * it couldn't be loaded.
+ */
+suspend fun loadMediaTotals(client: SynapseClient): MediaTotals? = try {
+    var bytes = 0L
+    var count = 0L
+    var from: String? = null
+    var pages = 0
+    do {
+        val page = client.mediaStats(from = from, limit = 100)
+        page.users.forEach { bytes += it.mediaLength; count += it.mediaCount }
+        from = page.nextToken
+        pages++
+    } while (from != null && pages < 20)
+    MediaTotals(bytes, count, from != null)
+} catch (e: CancellationException) {
+    throw e
+} catch (e: Exception) {
+    null
+}
+
+/**
+ * Loads everything the Overview shows, with reads only: user counts (v3 users with limit 1, which
+ * still reports the total; active and deactivated are asked for, and all users is their sum, since
+ * v3 returns both kinds when the filter is left out), the room count, open event reports, media
+ * usage, failing federation destinations, background updates and the health checks. Each part is
+ * loaded on its own, so one failing part doesn't hide the rest; who's signed in and admin access must
+ * work, or the whole summary fails with that error.
+ *
+ * Media usage is taken from [MediaTotalsCache] when a total younger than its maximum age is there,
+ * and added up (and kept there) otherwise. With [includeMedia] false it's left out (null), for a
+ * caller that loads it afterwards or doesn't need it.
+ */
+suspend fun loadSummary(client: SynapseClient, health: HealthChecker?, includeMedia: Boolean = true): Summary = coroutineScope {
     val status = client.status()
-    val total = async { runCatching { client.users(limit = 1).total }.getOrNull() }
     val active = async { runCatching { client.users(limit = 1, deactivated = false).total }.getOrNull() }
     val deactivated = async { runCatching { client.users(limit = 1, deactivated = true).total }.getOrNull() }
     val rooms = async { runCatching { client.rooms(limit = 1).totalRooms }.getOrNull() }
     val reports = async { runCatching { client.eventReports(limit = 1).total }.getOrNull() }
     val media = async {
-        runCatching {
-            var bytes = 0L
-            var count = 0L
-            var from: String? = null
-            var pages = 0
-            do {
-                val page = client.mediaStats(from = from, limit = 100)
-                page.users.forEach { bytes += it.mediaLength; count += it.mediaCount }
-                from = page.nextToken
-                pages++
-            } while (from != null && pages < 20)
-            Triple(bytes, count, from != null)
-        }.getOrNull()
+        if (!includeMedia) {
+            null
+        } else {
+            val key = MediaTotalsCache.keyFor(client)
+            MediaTotalsCache.fresh(key) ?: loadMediaTotals(client)?.also { MediaTotalsCache.put(key, it) }
+        }
     }
     val failing = async {
         runCatching { client.destinations(limit = 100, failingFirst = true).destinations.filter { it.failing }.map { it.destination } }.getOrDefault(emptyList())
@@ -94,15 +154,17 @@ suspend fun loadSummary(client: SynapseClient, health: HealthChecker?): Summary 
         else runCatching { health.check(status.serverName, synapseOk = true, synapseDetail = client.server.displayUrl) }.getOrDefault(emptyList())
     }
     val m = media.await()
+    val usersActive = active.await()
+    val usersDeactivated = deactivated.await()
     Summary(
         status = status,
-        usersTotal = total.await(),
-        usersActive = active.await(),
-        usersDeactivated = deactivated.await(),
+        usersTotal = if (usersActive != null && usersDeactivated != null) usersActive + usersDeactivated else null,
+        usersActive = usersActive,
+        usersDeactivated = usersDeactivated,
         rooms = rooms.await(),
-        mediaBytes = m?.first,
-        mediaCount = m?.second,
-        mediaPartial = m?.third == true,
+        mediaBytes = m?.bytes,
+        mediaCount = m?.count,
+        mediaPartial = m?.partial == true,
         reportsTotal = reports.await(),
         failingDestinations = failing.await(),
         background = background.await(),
