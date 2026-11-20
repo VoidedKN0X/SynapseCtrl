@@ -51,10 +51,31 @@ class Sessions(
     /** Bumped when the token changes without other server settings changing, so the client is rebuilt. */
     private val revision = MutableStateFlow(0)
 
+    /**
+     * The client last made, with the server settings and revision it was made for. The value [active]
+     * starts with is reused when the flow below reaches the same server, so the app starts with one
+     * client instead of two.
+     */
+    @Volatile
+    private var built: Triple<Server, Int, ActiveServer>? = null
+
+    private fun activeFor(server: Server, rev: Int): ActiveServer {
+        val last = built
+        if (last != null && last.first == server && last.second == rev) return last.third
+        return ActiveServer(server, clientFor(server)).also { built = Triple(server, rev, it) }
+    }
+
     val active: StateFlow<ActiveServer?> = combine(store.servers, store.activeId, revision) { list, id, rev -> list.firstOrNull { it.id == id } to rev }
         .distinctUntilChanged()
-        .map { (server, _) -> server?.let { ActiveServer(it, clientFor(it)) } }
-        .stateIn(scope, SharingStarted.Eagerly, store.servers.value.firstOrNull { it.id == store.activeId.value }?.let { ActiveServer(it, clientFor(it)) })
+        .map { (server, rev) ->
+            if (server == null) {
+                built = null
+                null
+            } else {
+                activeFor(server, rev)
+            }
+        }
+        .stateIn(scope, SharingStarted.Eagerly, store.servers.value.firstOrNull { it.id == store.activeId.value }?.let { activeFor(it, revision.value) })
 
     private val _connection = MutableStateFlow(Connection())
     val connection: StateFlow<Connection> = _connection.asStateFlow()

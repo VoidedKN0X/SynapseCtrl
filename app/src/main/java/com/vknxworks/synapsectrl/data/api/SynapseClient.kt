@@ -90,7 +90,12 @@ class SynapseClient(
     constructor(server: Server, base: OkHttpClient, secrets: ServerSecrets) : this(server, base, { secrets })
 
     private val baseUrl: HttpUrl = server.url.toHttpUrl()
-    val http: OkHttpClient = httpFor(base, baseUrl, server.certPin)
+
+    /**
+     * Made on first use (a request, which runs on a background thread) instead of when the client is
+     * created: setting up TLS for a pinned certificate is too slow for the main thread at app start.
+     */
+    val http: OkHttpClient by lazy { httpFor(base, baseUrl, server.certPin) }
 
     fun url(api: Api, segments: List<String>, query: List<Pair<String, String>> = emptyList()): HttpUrl {
         val b = baseUrl.newBuilder()
@@ -124,8 +129,16 @@ class SynapseClient(
     /**
      * Raw bytes of an authenticated media download (an avatar thumbnail), at most [maxBytes]. Null when
      * the server has none. Reads only; uses the same token, pin and allowlist as every other request.
+     * With [throwOnIo] a network failure is thrown as an [IOException] instead of returning null, so the
+     * caller can tell "couldn't ask" from "there is none".
      */
-    suspend fun bytes(api: Api, segments: List<String>, query: Map<String, String> = emptyMap(), maxBytes: Long = 512_000): ByteArray? {
+    suspend fun bytes(
+        api: Api,
+        segments: List<String>,
+        query: Map<String, String> = emptyMap(),
+        maxBytes: Long = 512_000,
+        throwOnIo: Boolean = false,
+    ): ByteArray? {
         awaitUnlocked()
         val token = secrets().token
         if (token.isEmpty()) return null
@@ -143,6 +156,7 @@ class SynapseClient(
                     bytes.takeIf { it.size <= maxBytes }
                 }
             } catch (e: IOException) {
+                if (throwOnIo) throw e
                 null
             }
         }

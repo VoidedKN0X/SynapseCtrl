@@ -69,6 +69,7 @@ import com.vknxworks.synapsectrl.ui.theme.Gutter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.io.IOException
 
 // ---------- Formatting ----------
 
@@ -219,7 +220,13 @@ fun Avatar(mxc: String?, label: String, size: Dp = 40.dp) {
         // (no "..", "/" or other path tricks) is ever put into a request that carries the admin token.
         if (!MXC_SERVER.matches(server) || !MXC_MEDIA_ID.matches(mediaId)) return@produceState
         val client = c.sessions.active.value?.client ?: return@produceState
-        val bytes = client.bytes(Api.Media, listOf("thumbnail", server, mediaId), mapOf("width" to "96", "height" to "96", "method" to "crop"))
+        val bytes = try {
+            client.bytes(Api.Media, listOf("thumbnail", server, mediaId), mapOf("width" to "96", "height" to "96", "method" to "crop"), throwOnIo = true)
+        } catch (e: IOException) {
+            // The network failed, which says nothing about the picture: don't remember it as missing, so it's
+            // tried again the next time this avatar is shown.
+            return@produceState
+        }
         val bmp = bytes?.let { runCatching { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }.getOrNull() }
         if (bmp != null) {
             AvatarCache.cache.put(uri, bmp)

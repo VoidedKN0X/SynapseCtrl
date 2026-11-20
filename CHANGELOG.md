@@ -2,6 +2,27 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Unreleased
+
+Not released yet: these changes are on `main` and will be part of the next version.
+
+### Removed
+
+- **The home screen widget is gone.** The **Synapse status** widget (online or not, active users, open reports) has been removed from SynapseCtrl, together with its background refresh. If you had it on your home screen, Android shows an empty or "can't load" box in its place after updating: remove that box by hand. SynapseCtrl cancels the widget's leftover refresh job and deletes the small file with the widget's last numbers the next time you open the app. App shortcuts (New invite, Users, Reports) are unchanged. SynapseCtrl never had a Quick Settings tile.
+
+### Changed
+
+- **Faster start with a pinned certificate.** The connection setup for a server with a self-signed certificate you trusted used to be made on the main thread while the app was starting, twice. It's now made once, on a background thread, with the first request.
+- **One connection object at start instead of two.** SynapseCtrl made the active server's connection twice while starting; it now makes it once.
+
+### Fixed
+
+- **Profile pictures come back after a network hiccup.** When loading a picture failed because the network dropped, SynapseCtrl remembered the picture as missing and showed the letter instead until the app was restarted. A network failure is no longer remembered: the picture is tried again the next time it's shown. Pictures the server really doesn't have are still remembered as missing.
+
+### Privacy
+
+- The widget's saved numbers (active users and open reports) are no longer kept on the phone, since the widget is gone.
+
 ## v1.0.10 (2026-11-20)
 
 ### Changed
