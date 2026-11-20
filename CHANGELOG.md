@@ -2,6 +2,21 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Unreleased
+
+Built and checked by CI only: nothing here has been run on a phone yet.
+
+### Changed
+
+- **The Overview no longer adds up all media on every refresh.** To show the local media size, SynapseCtrl goes through the media statistics of every user, 100 users per request, one request after the other (up to 20). It did that every time the Overview refreshed, which is every time you open the tab more than 30 seconds after the last refresh. The total is now kept (in memory only) for 10 minutes and reused when the Overview refreshes by itself. **Pulling down to refresh always adds it up again**, and so does the first refresh after you delete media in the app (one file under a user's media, or **Delete old local media**). What you might notice: for up to 10 minutes the media size can be older than the other numbers, for example right after someone uploaded a lot; pull down to get the current one.
+- **The rest of the Overview shows without waiting for the media size.** Users, rooms, reports, the attention list and the health checks now appear as soon as they are loaded; the media size is added up after that. While it is being added up, the tile shows the last known size (or a dash the first time) and the refresh indicator at the top keeps turning. A **Media over your limit** line in the attention list can therefore appear a moment after the rest. If adding it up fails, the tile shows a dash, as before.
+- **One request fewer for the user numbers.** The Overview asked your server three times for user counts (all, active, deactivated). It now asks for active and deactivated and adds them up for the total, which is the same number: Synapse counts both kinds when no filter is given. If one of the two requests fails, the total is left out for that refresh (it used to be asked on its own), and the "new users" notification simply compares again at the next check.
+- **Background checks skip the media statistics when they don't need them.** A background check only reads the media size for the **Media storage over a limit** notification. With that notification off (the default), the check no longer asks for the media statistics at all; with it on, it reuses a total that is less than 10 minutes old, for example from the Overview you just looked at, and so the notification can come up to 10 minutes later than before in that case.
+
+### Fixed
+
+- **The refresh indicator can't get stuck any more.** Leaving the Overview while it was still loading could leave it marked as loading until the next refresh finished. It is now always cleared when a load ends or is interrupted.
+
 ## v1.1.0 (2026-11-20)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.
