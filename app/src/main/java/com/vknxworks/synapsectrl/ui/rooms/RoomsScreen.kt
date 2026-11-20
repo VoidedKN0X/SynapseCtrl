@@ -148,7 +148,7 @@ fun RoomsScreen() {
                     }
                     else -> {
                         item { Text(stringResource(R.string.rooms_count, total), style = CtrlType.Data, color = CtrlColors.Muted, modifier = Modifier.padding(horizontal = Gutter, vertical = 4.dp)) }
-                        items(rooms, key = { it.roomId }) { r -> RoomRow(r) { nav.navigate(RoomRoute(r.roomId)) } }
+                        items(rooms, key = { it.roomId }, contentType = { "room" }) { r -> RoomRow(r) { nav.navigate(RoomRoute(r.roomId)) } }
                         if (next != null) {
                             item {
                                 CtrlTextButton(onClick = { scope.launch { load(next) } }, enabled = !loading, modifier = Modifier.fillMaxWidth().padding(8.dp)) {

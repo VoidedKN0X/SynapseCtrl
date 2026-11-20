@@ -180,7 +180,7 @@ fun UsersScreen() {
                         }
                         else -> {
                             item { Text(stringResource(R.string.users_count, total), style = CtrlType.Data, color = CtrlColors.Muted, modifier = Modifier.padding(horizontal = Gutter, vertical = 4.dp)) }
-                            items(users, key = { it.name }) { u -> UserRow(u, deviceCounts[u.name]) { nav.navigate(UserRoute(u.name)) } }
+                            items(users, key = { it.name }, contentType = { "user" }) { u -> UserRow(u, deviceCounts[u.name]) { nav.navigate(UserRoute(u.name)) } }
                             if (next != null) {
                                 item {
                                     CtrlTextButton(onClick = { scope.launch { load(next) } }, enabled = !loading, modifier = Modifier.fillMaxWidth().padding(8.dp)) {

@@ -14,6 +14,7 @@ Not released yet: these changes are on `main` and will be part of the next versi
 
 - **Faster start with a pinned certificate.** The connection setup for a server with a self-signed certificate you trusted used to be made on the main thread while the app was starting, twice. It's now made once, on a background thread, with the first request.
 - **One connection object at start instead of two.** SynapseCtrl made the active server's connection twice while starting; it now makes it once.
+- **Smoother scrolling in Users and Rooms.** The rows of both lists are now marked as one kind of row, so rows that scroll off the screen are reused for the ones scrolling in, next to the count line and the **Load more** button.
 
 ### Fixed
 
