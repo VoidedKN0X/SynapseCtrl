@@ -2,6 +2,12 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## v1.0.10 (2026-11-20)
+
+### Changed
+
+- **The app icon matches the other Ctrl apps.** SynapseCtrl's icon was drawn in a darker set of greys than the rest of the series: a near-black background, a darker keycap and a front bar you could hardly see. It now uses the same background, keycap and bar colours as the other Ctrl apps, so the icons look like one family side by side. The purple symbol and the themed (monochrome) icon are unchanged.
+
 ## v1.0.9 (2026-11-13)
 
 A security and privacy check-up. Nothing works differently, and you don't need to sign in again.
