@@ -58,7 +58,7 @@ Your servers, **Settings** and **About** are on the **You** page: tap your profi
 ## Is it safe to install?
 
 - **Open source.** All of SynapseCtrl's code is in this repo, under the GPL-3.0 licence. Anyone can read it.
-- **Built by GitHub Actions, not on a personal computer.** Every release on the Releases page is built from the code in this repo by [the build workflow](.github/workflows/build.yml), and you can see each build's log in the **Actions** tab.
+- **Built by GitHub Actions, not on a personal computer.** Every release on the Releases page is built from the code in this repo by [the build workflow](.github/workflows/build.yml), and you can see each build's log in the **Actions** tab. The signing key is kept away from the build: one job builds the APK without any secrets, and a separate job that runs no code from this repo signs it and checks the signature against the fingerprint below.
 - **Always signed with the same release key.** Android refuses to install an update that's signed with a different key, so nobody else can replace SynapseCtrl on your phone with their own version. The [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) only accepts APKs signed with this key, and the build checks it too. The SHA-256 fingerprint of the signing certificate is:
 
   ```
