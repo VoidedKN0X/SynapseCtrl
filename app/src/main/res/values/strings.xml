@@ -701,18 +701,7 @@
     <string name="create_admin_footer">Only make someone a server admin if they need to manage the server too.</string>
     <string name="create_user_note">The account works right away. Give the user ID and password to the person yourself; they can sign in with ChatCtrl or any Matrix app and change the password there.</string>
     <string name="user_exists">%1$s already exists. Pick another username.</string>
-    <!-- Widget and shortcuts -->
-    <string name="widget_name">Synapse status</string>
-    <string name="widget_description">Your Synapse server online or not, active users and open reports</string>
-    <string name="widget_users_label">Active users</string>
-    <string name="widget_reports_label">Open reports</string>
-    <string name="widget_no_server">No server added</string>
-    <string name="widget_locked">SynapseCtrl is locked</string>
-    <string name="widget_locked_subtitle">Unlock the app to see your server</string>
-    <string name="widget_unknown">Not checked yet</string>
-    <string name="widget_online">Online</string>
-    <string name="widget_offline">Unreachable · checked %1$s</string>
-    <string name="widget_no_value">—</string>
+    <!-- Shortcuts -->
     <string name="shortcut_invite">New invite</string>
     <string name="shortcut_invite_long">Create an invite token</string>
     <string name="shortcut_users">Users</string>

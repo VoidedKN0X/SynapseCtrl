@@ -19,7 +19,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Federation:** every server yours talks to, failing ones first, and **reset connection** for a server that's back.
 - **Server notices** to one user or to every active local user, with a preview.
 - **Notifications** from SynapseCtrl's own background checks: new event reports, failing health checks, unreachable servers, new users and media over a limit, with optional **push through ntfy**.
-- **Home screen widget** (online or not, active users, open reports) and **app shortcuts**: New invite, Users, Reports.
+- **App shortcuts**: New invite, Users, Reports.
 - **Safe by design:** read-only mode per server, a confirmation for every change, the user or room ID typed in for deactivating, deleting a room and deleting old local media, app lock with **Confirm changes**, certificate pinning, **Hide in screenshots** and **Hide in recent apps**, and access tokens encrypted with the Android Keystore (in the StrongBox security chip when the phone has one).
 - **Several servers**, and sign-in with an admin password (SynapseCtrl gets its own token and never stores the password) or a pasted access token.
 
@@ -80,8 +80,8 @@ Your servers, **Settings** and **About** are on the **You** page: tap your profi
 | Internet (`INTERNET`) | Talking to the Synapse servers you add, and reading their public discovery addresses for the health checks. Nothing else can be reached. |
 | Fingerprint (`USE_BIOMETRIC`) | Unlocking the app lock with your fingerprint, if you turn that on. |
 | Notifications (`POST_NOTIFICATIONS`) | Notifications from the background checks. Only asked for when you turn those on. |
-| Network state (`ACCESS_NETWORK_STATE`) | Running background checks and widget refreshes only when the phone has a connection. It never reads the Wi-Fi name. |
-| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Scheduling the background checks and widget refreshes again after the phone restarts. Added by Android's scheduler for background work (WorkManager). |
+| Network state (`ACCESS_NETWORK_STATE`) | Running background checks only when the phone has a connection. It never reads the Wi-Fi name. |
+| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Scheduling the background checks again after the phone restarts. Added by Android's scheduler for background work (WorkManager). |
 | Keep awake (`WAKE_LOCK`) | Letting a background check finish while the screen is off. Added by WorkManager. |
 | `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | An internal permission only SynapseCtrl itself holds (added by AndroidX), so other apps can't send to its private receivers. |
 | Hide other apps' floating windows over the PIN screen | While the lock or PIN screen, or a delete, deactivate, kick, remove-server, certificate or plain-HTTP confirmation, is showing, other apps' floating windows (chat heads, overlays) are hidden over it, so nothing can cover or imitate it. No prompt; overlays work as usual everywhere else. |

@@ -107,7 +107,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
-    // Background checks for notifications and the widget.
+    // Background checks for notifications.
     implementation(libs.androidx.work.runtime)
 
     implementation(platform(libs.compose.bom))

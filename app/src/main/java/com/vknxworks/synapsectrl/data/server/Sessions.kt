@@ -79,7 +79,7 @@ class Sessions(
     )
 
     /**
-     * A client for background work (notifications, the widget) that reads the token straight from
+     * A client for background work (notifications) that reads the token straight from
      * storage and doesn't wait for the app lock: it only works while the token isn't sealed (see
      * [ServerStore.sealedNow]). Reads only; it refuses to send any change.
      */

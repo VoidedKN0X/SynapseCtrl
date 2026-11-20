@@ -37,7 +37,10 @@ class MainActivity : ComponentActivity() {
         // Edge to edge; the bar icons are set to match the theme below, once it is known.
         enableEdgeToEdge()
         val c = container
-        if (savedInstanceState == null) handleIntent(intent)
+        if (savedInstanceState == null) {
+            handleIntent(intent)
+            container.cleanUpRemovedWidget()
+        }
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the

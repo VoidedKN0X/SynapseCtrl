@@ -20,8 +20,6 @@ class OverviewRepository(
     private val sessions: Sessions,
     private val health: HealthChecker,
     @Suppress("unused") private val scope: CoroutineScope,
-    /** Called with every fresh summary (the widget shows the same numbers). */
-    private val onSummary: (com.vknxworks.synapsectrl.data.server.Server, Summary) -> Unit = { _, _ -> },
 ) {
     private val _states = MutableStateFlow<Map<String, OverviewState>>(emptyMap())
     val states: StateFlow<Map<String, OverviewState>> = _states.asStateFlow()
@@ -41,7 +39,6 @@ class OverviewRepository(
             val summary = loadSummary(active.client, health)
             update(id) { OverviewState(summary = summary, loading = false, error = null) }
             sessions.reportStatus(id, summary.status)
-            runCatching { onSummary(active.server, summary) }
         } catch (e: ApiError) {
             update(id) { it.copy(loading = false, error = e) }
             sessions.reportError(id, e)

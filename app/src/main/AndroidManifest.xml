@@ -85,19 +85,6 @@
             </intent-filter>
         </service>
 
-        <!-- Home screen widget: the active server online or not, active users and open reports. -->
-        <receiver
-            android:name=".ui.widgets.StatusWidget"
-            android:exported="false"
-            android:label="@string/widget_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_status_info" />
-        </receiver>
-
         <!-- AndroidX's profile installer receiver lets other apps ask SynapseCtrl to write or skip its
              ART profile; it isn't needed, so leave it out. -->
         <receiver

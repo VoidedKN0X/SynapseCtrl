@@ -22,7 +22,7 @@ SynapseCtrl holds a server admin access token, which can do anything on your Syn
 - Your admin access token, passwords or other data leaking to anyone other than your own Synapse server (for example through a redirect, a federation or discovery lookup, or an avatar address)
 - Ways around the app lock or **Confirm changes**, or screens with tokens, registration tokens or passwords showing up in screenshots when they shouldn't
 - A change on your server (deactivating a user, deleting a room, deleting media) happening without the confirmation SynapseCtrl promises
-- Another app on the phone being able to make SynapseCtrl do something you didn't ask for (through its shortcuts, widget, notifications or the ntfy push receiver)
+- Another app on the phone being able to make SynapseCtrl do something you didn't ask for (through its shortcuts, notifications or the ntfy push receiver)
 - Anything that lets someone run code or read files they shouldn't
 
 Problems in Synapse itself should go to [the Synapse project](https://github.com/element-hq/synapse/security).
