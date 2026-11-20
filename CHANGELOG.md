@@ -2,9 +2,9 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
-## Unreleased
+## v1.1.0 (2026-11-20)
 
-Not released yet: these changes are on `main` and will be part of the next version.
+Built and checked by CI only: nothing in this release had been run on a phone when it was published.
 
 ### Removed
 
