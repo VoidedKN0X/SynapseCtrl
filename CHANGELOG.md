@@ -2,6 +2,12 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Unreleased
+
+### New
+
+- **SynapseCtrl in French and German, following the phone's language.** The whole app is now also translated into French (polite "vous" form) and German (informal "du" form), so it covers English, Dutch, French and German. Android picks the language from your phone's settings and falls back to English for any other language. SynapseCtrl now also tells Android which languages it has, so Android 13 and later offer English, Dutch, French and German under Settings › Apps › SynapseCtrl › Language. Technical names (Synapse, LiveKit, ntfy, MatrixRTC, file paths, Matrix IDs, homeserver.yaml settings) stay as they are, and so do error texts that come from your server.
+
 ## v1.3.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.
