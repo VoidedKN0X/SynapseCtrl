@@ -364,7 +364,7 @@
     <string name="ev_report">New event reports</string>
     <string name="ev_report_sub">Someone on your server reported a message</string>
     <string name="ev_health">Health check failing</string>
-    <string name="ev_health_sub">Client or server discovery, federation or calls (MatrixRTC) stopped working</string>
+    <string name="ev_health_sub">Client or server discovery, federation, large requests or calls (MatrixRTC, LiveKit) stopped working</string>
     <string name="ev_new_user">New users</string>
     <string name="ev_new_user_sub">Someone signed up with a registration token, or an account was created</string>
     <string name="ev_media">Media storage over a limit</string>
@@ -408,7 +408,7 @@
     <string name="att_media_detail">Over your limit of %1$s (set it in Notifications)</string>
     <string name="att_background">Database updates running</string>
     <string name="group_health">Health checks</string>
-    <string name="health_footer">Checked from your phone against your server\'s public addresses, without any outside tester. Pull down to check again.</string>
+    <string name="health_footer">Checked from your phone against your server\'s public addresses, without any outside tester. The large-request test sends about 300 kB without signing in, which Synapse refuses, so nothing changes on your server; it\'s repeated every 3 hours at most (every 30 minutes while it fails). Pull down to check everything again now.</string>
     <string name="health_unavailable">Health checks couldn\'t run</string>
     <string name="health_synapse">Synapse</string>
     <string name="health_synapse_pass">The admin API answers at the address saved in SynapseCtrl</string>
@@ -428,6 +428,15 @@
     <string name="health_rtc_pass">Client discovery lists your LiveKit service, and it answers</string>
     <string name="health_rtc_warn">Your LiveKit service answers with an error</string>
     <string name="health_rtc_fail">No working LiveKit service: calls in Element X won\'t connect</string>
+    <string name="health_sfu">LiveKit media server</string>
+    <string name="health_sfu_pass">LiveKit itself answers its health check next to the call service</string>
+    <string name="health_sfu_warn">LiveKit\'s address answers with a server error: calls may not connect</string>
+    <string name="health_sfu_fail">LiveKit doesn\'t answer or says it isn\'t ready: calls won\'t connect</string>
+    <string name="health_sfu_skip">Couldn\'t find LiveKit next to the call service, so it wasn\'t checked. That\'s normal when it has its own address.</string>
+    <string name="health_large">Large requests</string>
+    <string name="health_large_pass">A 300 kB test request reached Synapse through your public address</string>
+    <string name="health_large_fail">Your reverse proxy rejects large requests before they reach Synapse: uploads, key backups and long messages fail in chat apps. Check its upload size limit and its temporary folder for request bodies.</string>
+    <string name="health_large_warn">The large test request got an answer that isn\'t from Synapse, or was cut off</string>
     <string name="group_server">Server</string>
     <string name="invites_title">Invites</string>
     <string name="invites_subtitle">Registration tokens, and sharing an invite</string>
@@ -708,4 +717,81 @@
     <string name="shortcut_users_long">Users</string>
     <string name="shortcut_reports">Reports</string>
     <string name="shortcut_reports_long">Event reports</string>
+
+    <!-- Sessions and pushers -->
+    <string name="sessions_title">Sessions and push</string>
+    <string name="sessions_subtitle">Where this account connected from, and where its notifications go</string>
+    <string name="group_sessions">Connections (%d)</string>
+    <string name="sessions_footer">The IP addresses, times and apps Synapse last saw for each of this account\'s devices. Synapse keeps these for a limited time.</string>
+    <string name="sessions_none">Synapse has no connections on record for this account</string>
+    <string name="sessions_no_ip">Unknown address</string>
+    <string name="sessions_no_device">No device ID</string>
+    <string name="sessions_more">%d more not shown</string>
+    <string name="group_pushers">Pushers (%d)</string>
+    <string name="pushers_footer">A pusher is where Synapse sends this account\'s notifications: an app\'s push gateway or an e-mail address.</string>
+    <string name="pushers_none">No pushers: no app or e-mail address gets this account\'s notifications</string>
+    <string name="pusher_kind_email">E-mail</string>
+    <string name="pusher_kind_http">Push gateway</string>
+
+    <!-- E-mail addresses and phone numbers -->
+    <string name="threepids_title">E-mail and phone</string>
+    <string name="threepids_body">E-mail addresses and phone numbers of %s. They\'re used to reset the password and to find the account. Saving replaces the list on the server with what you see here.</string>
+    <string name="threepids_none">None</string>
+    <string name="threepid_email">E-mail</string>
+    <string name="threepid_phone">Phone</string>
+    <string name="threepid_email_hint">E-mail address</string>
+    <string name="threepid_phone_hint">Phone number with country code</string>
+    <string name="threepid_add">Add to the list</string>
+    <string name="threepids_changes">Saving adds %1$d and removes %2$d</string>
+    <string name="find_email_title">Find the account with this e-mail address</string>
+    <string name="find_email_subtitle">Looks up %s among the addresses linked to accounts</string>
+    <string name="find_email_none">No account has %s</string>
+
+    <!-- Redact all of a user's messages -->
+    <string name="redact_user">Redact all messages</string>
+    <string name="redact_user_subtitle">Removes the content of everything this account sent</string>
+    <string name="redact_user_title">Redact everything %s sent?</string>
+    <plurals name="redact_user_body">
+        <item quantity="one">The content of this account\'s messages and other events is removed for everyone, in the %d room it is in or banned from. The account itself stays. This can\'t be undone.</item>
+        <item quantity="other">The content of this account\'s messages and other events is removed for everyone, in all %d rooms it is in or banned from. The account itself stays. This can\'t be undone.</item>
+    </plurals>
+    <string name="redact_user_body_unknown">The content of this account\'s messages and other events is removed for everyone, in every room it is in or banned from. The account itself stays. This can\'t be undone.</string>
+    <string name="redact_user_confirm">Redact</string>
+    <string name="redact_user_reason">Reason (optional, visible to everyone)</string>
+    <string name="redact_user_limit">Events to go through per room, newest first</string>
+    <string name="redact_status_running">Redacting…</string>
+    <string name="redact_status_complete">Redaction finished</string>
+    <string name="redact_status_failed">Redaction failed</string>
+    <string name="redact_status_scheduled">Waiting to start</string>
+    <string name="redact_status_active">Redacting messages</string>
+    <string name="redact_status_all_done">Everything found was redacted.</string>
+    <plurals name="redact_status_some_failed">
+        <item quantity="one">%1$d event couldn\'t be redacted: %2$s</item>
+        <item quantity="other">%1$d events couldn\'t be redacted. First error: %2$s</item>
+    </plurals>
+    <string name="redact_status_id">Redaction ID: %s</string>
+
+    <!-- Room messages and purge history -->
+    <string name="room_messages_title">Messages</string>
+    <string name="room_messages_subtitle">Browse what was sent in this room, newest first</string>
+    <string name="room_messages_note">Straight from the server\'s database, newest first. Tap an event for all of it. In encrypted rooms the server only knows who sent something and when.</string>
+    <string name="room_messages_empty">No events</string>
+    <string name="room_messages_empty_body">The server has no events for this room.</string>
+    <string name="room_messages_older">Load older</string>
+    <string name="room_messages_redacted">Redacted</string>
+    <string name="room_messages_encrypted">Encrypted message</string>
+    <string name="purge_history">Purge old history</string>
+    <string name="purge_history_subtitle">Deletes old messages from the server\'s database to free space</string>
+    <string name="purge_title">Purge old history of %s?</string>
+    <string name="purge_body">Messages older than the number of days below are deleted from this server\'s database. Members can\'t scroll back to them any more. Room settings, memberships and the newest message always stay.</string>
+    <string name="purge_confirm">Purge</string>
+    <string name="purge_days">Older than (days)</string>
+    <string name="purge_local">Also messages from this server\'s users</string>
+    <string name="purge_local_sub">Off: only messages that came from other servers are deleted (those servers still have them). On: your own users\' messages go too, and this server may hold the only copy.</string>
+    <string name="purge_status_running">Purging…</string>
+    <string name="purge_status_complete">Purge finished</string>
+    <string name="purge_status_failed">Purge failed</string>
+    <string name="purge_status_active">Deleting old messages</string>
+    <string name="purge_status_done_hint">The space is free for Synapse to reuse. Giving it back to the disk needs a VACUUM FULL on the database.</string>
+    <string name="purge_status_id">Purge ID: %s</string>
 </resources>

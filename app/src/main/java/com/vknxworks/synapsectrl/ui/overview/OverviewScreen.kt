@@ -227,6 +227,8 @@ fun healthTitle(id: HealthId): Int = when (id) {
     HealthId.WELL_KNOWN_SERVER -> R.string.health_wk_server
     HealthId.FEDERATION -> R.string.health_federation
     HealthId.RTC -> R.string.health_rtc
+    HealthId.LARGE_REQUEST -> R.string.health_large
+    HealthId.RTC_SFU -> R.string.health_sfu
 }
 
 private fun healthExplanation(check: HealthCheck): Int = when (check.id) {
@@ -234,18 +236,29 @@ private fun healthExplanation(check: HealthCheck): Int = when (check.id) {
     HealthId.WELL_KNOWN_CLIENT -> when (check.state) {
         HealthState.PASS -> R.string.health_wk_client_pass
         HealthState.WARN -> R.string.health_wk_client_warn
-        HealthState.FAIL -> R.string.health_wk_client_fail
+        HealthState.FAIL, HealthState.SKIP -> R.string.health_wk_client_fail
     }
     HealthId.WELL_KNOWN_SERVER -> if (check.state == HealthState.PASS) R.string.health_wk_server_pass else R.string.health_wk_server_warn
     HealthId.FEDERATION -> when (check.state) {
         HealthState.PASS -> R.string.health_federation_pass
         HealthState.WARN -> R.string.health_federation_warn
-        HealthState.FAIL -> R.string.health_federation_fail
+        HealthState.FAIL, HealthState.SKIP -> R.string.health_federation_fail
     }
     HealthId.RTC -> when (check.state) {
         HealthState.PASS -> R.string.health_rtc_pass
         HealthState.WARN -> R.string.health_rtc_warn
-        HealthState.FAIL -> R.string.health_rtc_fail
+        HealthState.FAIL, HealthState.SKIP -> R.string.health_rtc_fail
+    }
+    HealthId.LARGE_REQUEST -> when (check.state) {
+        HealthState.PASS -> R.string.health_large_pass
+        HealthState.FAIL -> R.string.health_large_fail
+        HealthState.WARN, HealthState.SKIP -> R.string.health_large_warn
+    }
+    HealthId.RTC_SFU -> when (check.state) {
+        HealthState.PASS -> R.string.health_sfu_pass
+        HealthState.WARN -> R.string.health_sfu_warn
+        HealthState.FAIL -> R.string.health_sfu_fail
+        HealthState.SKIP -> R.string.health_sfu_skip
     }
 }
 
@@ -255,6 +268,7 @@ private fun HealthRow(check: HealthCheck) {
         HealthState.PASS -> Icons.Outlined.CheckCircle to Health.ok
         HealthState.WARN -> Icons.Outlined.WarningAmber to Health.warn
         HealthState.FAIL -> Icons.Outlined.ErrorOutline to Health.critical
+        HealthState.SKIP -> Icons.Outlined.Info to CtrlColors.Muted
     }
     val explanation = stringResource(healthExplanation(check))
     GroupRow(

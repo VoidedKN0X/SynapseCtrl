@@ -94,7 +94,7 @@ class AppContainer(val context: Context) {
     val sessions = Sessions(serverStore, http, appScope, locked)
 
     /** Health checks against the public discovery endpoints; their own HTTP client, never with the token. */
-    val health = HealthChecker()
+    val health = HealthChecker(File(context.noBackupFilesDir, "health"))
     val overview = OverviewRepository(sessions, health, appScope)
 
     /** Set by MainActivity when a launcher shortcut opened SynapseCtrl; the main screen handles it after unlocking. */

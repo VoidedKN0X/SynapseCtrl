@@ -28,12 +28,85 @@ data class AdminUser(
     @SerialName("creation_ts") val creationTs: Long = 0,
     @SerialName("last_seen_ts") val lastSeenTs: Long? = null,
     @SerialName("appservice_id") val appserviceId: String? = null,
+    /** E-mail addresses and phone numbers; only in the single-user API. */
+    val threepids: List<Threepid> = emptyList(),
 ) {
     /** The name to show: the display name, or the user ID without "@" and the server. */
     val label: String get() = displayname?.takeIf { it.isNotBlank() } ?: name.removePrefix("@").substringBefore(':')
 
     /** [creationTs] in milliseconds, whether Synapse sent seconds or milliseconds. */
     val createdMs: Long get() = if (creationTs in 1..99_999_999_999L) creationTs * 1000 else creationTs
+}
+
+/** A third-party ID of an account: an e-mail address ("email") or a phone number ("msisdn"). */
+@Serializable
+data class Threepid(
+    val medium: String = "",
+    val address: String = "",
+    @SerialName("added_at") val addedAt: Long? = null,
+    @SerialName("validated_at") val validatedAt: Long? = null,
+)
+
+/** GET /_synapse/admin/v1/threepid/<medium>/users/<address>. */
+@Serializable
+data class ThreepidOwner(@SerialName("user_id") val userId: String = "")
+
+/** GET /_synapse/admin/v1/whois/<user_id>: the connections Synapse has seen, per device. */
+@Serializable
+data class Whois(
+    @SerialName("user_id") val userId: String = "",
+    /** Keyed by device ID; "" for sessions without one. */
+    val devices: Map<String, WhoisDevice> = emptyMap(),
+)
+
+@Serializable
+data class WhoisDevice(val sessions: List<WhoisSession> = emptyList())
+
+@Serializable
+data class WhoisSession(val connections: List<WhoisConnection> = emptyList())
+
+@Serializable
+data class WhoisConnection(
+    val ip: String? = null,
+    /** Milliseconds. */
+    @SerialName("last_seen") val lastSeen: Long? = null,
+    @SerialName("user_agent") val userAgent: String? = null,
+)
+
+/** GET /_synapse/admin/v1/users/<user_id>/pushers. */
+@Serializable
+data class Pushers(val pushers: List<Pusher> = emptyList(), val total: Long = 0)
+
+@Serializable
+data class Pusher(
+    @SerialName("app_display_name") val appDisplayName: String? = null,
+    @SerialName("app_id") val appId: String = "",
+    val data: PusherData = PusherData(),
+    @SerialName("device_display_name") val deviceDisplayName: String? = null,
+    /** "http" (a push gateway) or "email". */
+    val kind: String = "",
+    val lang: String? = null,
+    @SerialName("profile_tag") val profileTag: String? = null,
+    val pushkey: String = "",
+)
+
+@Serializable
+data class PusherData(val url: String? = null, val format: String? = null)
+
+/** POST /_synapse/admin/v1/user/<user_id>/redact. */
+@Serializable
+data class RedactStarted(@SerialName("redact_id") val redactId: String = "")
+
+/** GET /_synapse/admin/v1/user/redact_status/<redact_id>. */
+@Serializable
+data class RedactStatus(
+    /** scheduled, active, complete or failed. */
+    val status: String = "",
+    /** Event ID to the error, for events that couldn't be redacted. */
+    @SerialName("failed_redactions") val failedRedactions: Map<String, String> = emptyMap(),
+    val error: String? = null,
+) {
+    val finished: Boolean get() = status == "complete" || status == "failed"
 }
 
 @Serializable
@@ -177,6 +250,29 @@ data class RoomMembers(val members: List<String> = emptyList(), val total: Long 
 /** GET /_synapse/admin/v1/rooms/<room_id>/state. */
 @Serializable
 data class RoomState(val state: List<JsonObject> = emptyList())
+
+/** GET /_synapse/admin/v1/rooms/<room_id>/messages: the same shape as the Matrix client API's /messages. */
+@Serializable
+data class RoomMessages(
+    val chunk: List<JsonObject> = emptyList(),
+    val start: String? = null,
+    /** Pass as "from" for the next page; missing when there is nothing further. */
+    val end: String? = null,
+)
+
+/** POST /_synapse/admin/v1/purge_history/<room_id>. */
+@Serializable
+data class PurgeStarted(@SerialName("purge_id") val purgeId: String = "")
+
+/** GET /_synapse/admin/v1/purge_history_status/<purge_id>. */
+@Serializable
+data class PurgeStatus(
+    /** active, complete or failed. */
+    val status: String = "",
+    val error: String? = null,
+) {
+    val finished: Boolean get() = status == "complete" || status == "failed"
+}
 
 /** GET /_synapse/admin/v1/rooms/<room_id>/block. */
 @Serializable

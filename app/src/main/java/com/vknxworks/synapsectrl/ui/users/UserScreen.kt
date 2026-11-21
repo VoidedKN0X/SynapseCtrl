@@ -15,6 +15,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.AlternateEmail
+import androidx.compose.material.icons.outlined.CleaningServices
+import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Campaign
@@ -54,6 +57,9 @@ import com.vknxworks.synapsectrl.container
 import com.vknxworks.synapsectrl.data.admin.AdminDevice
 import com.vknxworks.synapsectrl.data.admin.AdminUser
 import com.vknxworks.synapsectrl.data.admin.RateLimit
+import com.vknxworks.synapsectrl.data.admin.Threepid
+import com.vknxworks.synapsectrl.data.admin.redactUser
+import com.vknxworks.synapsectrl.data.admin.setThreepids
 import com.vknxworks.synapsectrl.data.admin.UserMediaStat
 import com.vknxworks.synapsectrl.data.admin.clearRateLimit
 import com.vknxworks.synapsectrl.data.admin.deactivate
@@ -97,6 +103,7 @@ import com.vknxworks.synapsectrl.ui.nav.LocalNavigator
 import com.vknxworks.synapsectrl.ui.nav.RoomRoute
 import com.vknxworks.synapsectrl.ui.nav.ServerNoticeRoute
 import com.vknxworks.synapsectrl.ui.nav.UserMediaRoute
+import com.vknxworks.synapsectrl.ui.nav.UserSessionsRoute
 import com.vknxworks.synapsectrl.ui.theme.CtrlColors
 import com.vknxworks.synapsectrl.ui.theme.CtrlType
 import com.vknxworks.synapsectrl.ui.theme.Gutter
@@ -126,6 +133,8 @@ private sealed class Pending {
     data class LogoutDevice(val device: AdminDevice) : Pending()
     data object QuarantineMedia : Pending()
     data object Deactivate : Pending()
+    data object Threepids : Pending()
+    data object Redact : Pending()
 }
 
 @Composable
@@ -143,6 +152,7 @@ fun UserScreen(userId: String) {
     var error by remember { mutableStateOf<ApiError?>(null) }
     var reload by remember { mutableStateOf(0) }
     var pending by remember { mutableStateOf<Pending?>(null) }
+    var redacting by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(userId, reload, server?.id) {
         val client = active?.client ?: return@LaunchedEffect
@@ -212,6 +222,13 @@ fun UserScreen(userId: String) {
                             u.lastSeenTs?.takeIf { it > 0 }?.let { "${relativeTime(it)} · ${formatDateTime(context, it)}" } ?: stringResource(R.string.never_seen),
                             icon = Icons.Outlined.Schedule,
                         )
+                        GroupRow(
+                            stringResource(R.string.threepids_title),
+                            u.threepids.joinToString("\n") { it.address }.ifBlank { stringResource(R.string.threepids_none) },
+                            icon = Icons.Outlined.AlternateEmail,
+                            showChevron = !readOnly && !u.deactivated,
+                            onClick = if (!readOnly && !u.deactivated) ({ pending = Pending.Threepids }) else null,
+                        )
                         u.userType?.let { GroupRow(stringResource(R.string.user_type), it) }
                         u.appserviceId?.let { GroupRow(stringResource(R.string.appservice), it) }
                     }
@@ -232,6 +249,11 @@ fun UserScreen(userId: String) {
                                 onClick = if (!readOnly) ({ pending = Pending.LogoutDevice(d) }) else null,
                             )
                         }
+                        GroupRow(
+                            stringResource(R.string.sessions_title), stringResource(R.string.sessions_subtitle),
+                            icon = Icons.Outlined.TravelExplore, showChevron = true,
+                            onClick = { nav.navigate(UserSessionsRoute(userId)) },
+                        )
                         if (!readOnly && !devices.isNullOrEmpty()) {
                             GroupRow(
                                 stringResource(R.string.logout_all_devices), icon = Icons.Outlined.Logout,
@@ -290,6 +312,13 @@ fun UserScreen(userId: String) {
                             }
                             GroupRow(stringResource(R.string.send_notice), stringResource(R.string.send_notice_subtitle), icon = Icons.Outlined.Campaign, showChevron = true, onClick = { nav.navigate(ServerNoticeRoute(userId)) })
                             GroupRow(stringResource(R.string.quarantine_user_media), stringResource(R.string.quarantine_user_media_subtitle), icon = Icons.Outlined.GppBad, onClick = { pending = Pending.QuarantineMedia })
+                            if (!isMe) {
+                                GroupRow(
+                                    stringResource(R.string.redact_user), stringResource(R.string.redact_user_subtitle),
+                                    icon = Icons.Outlined.CleaningServices, iconTint = MaterialTheme.colorScheme.error, titleColor = MaterialTheme.colorScheme.error,
+                                    onClick = { pending = Pending.Redact },
+                                )
+                            }
                         }
                         if (!isMe) {
                             Group(footer = stringResource(R.string.deactivate_footer)) {
@@ -314,8 +343,39 @@ fun UserScreen(userId: String) {
     val client = active?.client
     val u = info?.user
     if (client == null || u == null) return
+    redacting?.let { id ->
+        RedactProgressDialog(redactId = id, onClose = {
+            redacting = null
+            reload++
+        })
+    }
     when (val p = pending) {
         null -> Unit
+        Pending.Threepids -> ThreepidsDialog(
+            user = u,
+            onDismiss = { pending = null },
+        ) { wanted ->
+            change(R.string.done_saved) {
+                // The API replaces the whole list, so the change is applied to what the server has right now,
+                // not to what this screen loaded a while ago.
+                fun key(t: Threepid) = t.medium to t.address
+                val shown = u.threepids.map(::key).toSet()
+                val want = wanted.map(::key).toSet()
+                val removed = shown - want
+                val added = wanted.filter { key(it) !in shown }
+                val current = client.user(userId).threepids
+                val next = current.filter { key(it) !in removed } + added.filter { a -> current.none { key(it) == key(a) } }
+                client.setThreepids(userId, next)
+            }
+        }
+        Pending.Redact -> RedactUserDialog(
+            user = u,
+            rooms = info?.rooms?.size,
+            onDismiss = { pending = null },
+        ) { reason, limit ->
+            pending = null
+            actions.run(null) { redacting = client.redactUser(userId, reason, limit).redactId }
+        }
         Pending.ResetPassword -> ResetPasswordDialog(
             userId = userId,
             onDismiss = { pending = null },

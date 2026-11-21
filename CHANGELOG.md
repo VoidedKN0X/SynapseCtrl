@@ -2,6 +2,21 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Unreleased
+
+Built and checked by CI only: nothing here had been run on a phone when it was written.
+
+### New
+
+- **Health check: Large requests.** A reverse proxy in front of Synapse can keep answering small requests while it rejects every large one (an upload limit that is too small, or a missing temporary folder for request bodies, which gives an nginx "500" page). Chat apps then fail on uploads, key backups and long messages while everything else looks fine. The Overview now sends one test request of about 300 kB to your server's public address (the one client discovery names), without signing in. Synapse refuses it with its normal "missing token" answer, so **nothing is stored or changed on your server**. If that answer comes back, the check passes. If the proxy answers with its own error page instead (413 or any 5xx that isn't Synapse's JSON), the check fails, shows the status and the proxy's name, and counts as a failing health check for the attention list and the **Health check failing** notification. Any other odd answer, or a connection cut off half-way, is a warning. To keep data use low, the test is repeated at most every 3 hours (every 30 minutes while it isn't passing); pulling down on the Overview runs it at once.
+- **Health check: LiveKit media server.** Next to the existing calls check (the MatrixRTC service named in client discovery answers), the Overview now also asks LiveKit itself for its health answer, at the place the two documented setups put it: `/livekit/sfu` next to `/livekit/jwt`, or the root of the host when the call service is announced without a path. "OK" passes, "Not Ready" or no answer fails, a server error is a warning. When LiveKit can't be found there (it has its own address), the row says it wasn't checked instead of raising an alarm. Only GET requests, without your token.
+- **Sessions and push** on a user's page: every connection Synapse has on record for the account (IP address, when, which app, per device) and the account's pushers (which app or e-mail address gets its notifications, and through which push gateway).
+- **E-mail and phone** on a user's page: the e-mail addresses and phone numbers linked to the account, and a dialog to add or remove them. Synapse replaces the whole list when it is saved, so SynapseCtrl shows how many entries are added and removed first, and applies your change to the list as the server has it at that moment.
+- **Find an account by e-mail address.** Type a complete e-mail address in the Users search and a row appears above the list that looks up which account it belongs to and opens it. (The normal search only looks at user IDs and display names.)
+- **Redact all messages** of a user (not offered for the account you're signed in with): removes the content of everything the account sent, in every room it is in or banned from. You type the user ID to confirm, can give a reason (visible to everyone) and choose how many events per room are gone through (1000, newest first, unless you change it). The server does the work in the background; a dialog follows it and reports events that couldn't be redacted.
+- **Message browser** for a room: the room's events straight from the server's database, newest first, 30 at a time, with sender and time; tap one to see all of it and copy it. Encrypted messages show as encrypted: the server can't read them either.
+- **Purge old history** of a room: deletes messages older than a number of days from the server's database to free space. Messages that came from other servers are deleted; your own users' messages only when you switch that on. The room's settings, memberships and newest message always stay. You type the room ID to confirm, and a dialog follows the server's progress.
+
 ## v1.2.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published. It is the first release built with the new build tools (Android Gradle Plugin 9, stricter code shrinking), so update over your installed version and check that your data and settings are still there.

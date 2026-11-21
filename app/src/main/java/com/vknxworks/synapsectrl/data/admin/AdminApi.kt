@@ -180,6 +180,60 @@ suspend fun SynapseClient.clearRateLimit(userId: String) {
     delete(V1, "users", userId, "override_ratelimit")
 }
 
+/** GET /_synapse/admin/v1/whois/<user_id>: IP addresses, times and user agents of the user's sessions. */
+suspend fun SynapseClient.whois(userId: String): Whois = decode(Whois.serializer(), get(V1, "whois", userId))
+
+/** GET /_synapse/admin/v1/users/<user_id>/pushers: where the user's notifications are pushed to. */
+suspend fun SynapseClient.pushers(userId: String): Pushers = decode(Pushers.serializer(), get(V1, "users", userId, "pushers"))
+
+/**
+ * GET /_synapse/admin/v1/threepid/<medium>/users/<address>: whose e-mail address ("email") or phone
+ * number ("msisdn") this is. Null when no account has it (404 M_NOT_FOUND).
+ */
+suspend fun SynapseClient.findByThreepid(medium: String, address: String): String? = try {
+    decode(ThreepidOwner.serializer(), get(V1, "threepid", medium, "users", address)).userId.takeIf { it.isNotBlank() }
+} catch (e: com.vknxworks.synapsectrl.data.api.ApiError.NotFound) {
+    null
+}
+
+/**
+ * PUT /_synapse/admin/v2/users/<user_id> with "threepids": replaces every e-mail address and phone
+ * number of the account with [threepids] (medium and address only, as the API takes them).
+ */
+suspend fun SynapseClient.setThreepids(userId: String, threepids: List<Threepid>) {
+    put(
+        V2, "users", userId,
+        body = buildJsonObject {
+            put(
+                "threepids",
+                JsonArray(threepids.map { t -> buildJsonObject { put("medium", t.medium); put("address", t.address) } }),
+            )
+        },
+    )
+}
+
+/**
+ * POST /_synapse/admin/v1/user/<user_id>/redact with an empty room list: redacts the user's events in
+ * every room they're in (or banned from), newest first, at most [limit] events looked at per room.
+ * Runs in the background on the server; follow it with [redactStatus].
+ */
+suspend fun SynapseClient.redactUser(userId: String, reason: String?, limit: Int): RedactStarted =
+    decode(
+        RedactStarted.serializer(),
+        post(
+            V1, "user", userId, "redact",
+            body = buildJsonObject {
+                put("rooms", JsonArray(emptyList()))
+                if (!reason.isNullOrBlank()) put("reason", reason)
+                put("limit", limit)
+            },
+        ),
+    )
+
+/** GET /_synapse/admin/v1/user/redact_status/<redact_id>. */
+suspend fun SynapseClient.redactStatus(redactId: String): RedactStatus =
+    decode(RedactStatus.serializer(), get(V1, "user", "redact_status", redactId))
+
 // ---------- Media ----------
 
 /** GET /_synapse/admin/v1/statistics/users/media, biggest users first. */
@@ -314,6 +368,37 @@ suspend fun SynapseClient.roomMembers(roomId: String): RoomMembers = decode(Room
 
 /** GET /_synapse/admin/v1/rooms/<room_id>/state. */
 suspend fun SynapseClient.roomState(roomId: String): RoomState = decode(RoomState.serializer(), get(V1, "rooms", roomId, "state"))
+
+/**
+ * GET /_synapse/admin/v1/rooms/<room_id>/messages, newest first (dir=b). Without [from] it starts at
+ * the newest event; pass the previous page's "end" for older ones.
+ */
+suspend fun SynapseClient.roomMessages(roomId: String, from: String? = null, limit: Int = 30): RoomMessages =
+    decode(
+        RoomMessages.serializer(),
+        get(V1, "rooms", roomId, "messages", query = mapOf("from" to from, "limit" to limit.toString(), "dir" to "b").clean()),
+    )
+
+/**
+ * POST /_synapse/admin/v1/purge_history/<room_id>: removes events older than [beforeTs] (milliseconds)
+ * from the database. Events sent by this server's own users are only removed with [deleteLocal]. Room
+ * state and the newest message always stay. Runs in the background; follow it with [purgeStatus].
+ */
+suspend fun SynapseClient.purgeHistory(roomId: String, beforeTs: Long, deleteLocal: Boolean): PurgeStarted =
+    decode(
+        PurgeStarted.serializer(),
+        post(
+            V1, "purge_history", roomId,
+            body = buildJsonObject {
+                put("delete_local_events", deleteLocal)
+                put("purge_up_to_ts", beforeTs)
+            },
+        ),
+    )
+
+/** GET /_synapse/admin/v1/purge_history_status/<purge_id>. */
+suspend fun SynapseClient.purgeStatus(purgeId: String): PurgeStatus =
+    decode(PurgeStatus.serializer(), get(V1, "purge_history_status", purgeId))
 
 /** GET /_synapse/admin/v1/rooms/<room_id>/block. */
 suspend fun SynapseClient.blockStatus(roomId: String): BlockStatus = decode(BlockStatus.serializer(), get(V1, "rooms", roomId, "block"))

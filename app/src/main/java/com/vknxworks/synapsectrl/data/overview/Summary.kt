@@ -129,9 +129,10 @@ suspend fun loadMediaTotals(client: SynapseClient): MediaTotals? = try {
  *
  * Media usage is taken from [MediaTotalsCache] when a total younger than its maximum age is there,
  * and added up (and kept there) otherwise. With [includeMedia] false it's left out (null), for a
- * caller that loads it afterwards or doesn't need it.
+ * caller that loads it afterwards or doesn't need it. With [forceHealth] the large-request test is
+ * sent now instead of using its last result (see [HealthChecker]).
  */
-suspend fun loadSummary(client: SynapseClient, health: HealthChecker?, includeMedia: Boolean = true): Summary = coroutineScope {
+suspend fun loadSummary(client: SynapseClient, health: HealthChecker?, includeMedia: Boolean = true, forceHealth: Boolean = false): Summary = coroutineScope {
     val status = client.status()
     val active = async { runCatching { client.users(limit = 1, deactivated = false).total }.getOrNull() }
     val deactivated = async { runCatching { client.users(limit = 1, deactivated = true).total }.getOrNull() }
@@ -151,7 +152,7 @@ suspend fun loadSummary(client: SynapseClient, health: HealthChecker?, includeMe
     val background = async { runCatching { client.backgroundUpdates() }.getOrNull() }
     val checks = async {
         if (health == null || status.serverName.isBlank()) emptyList()
-        else runCatching { health.check(status.serverName, synapseOk = true, synapseDetail = client.server.displayUrl) }.getOrDefault(emptyList())
+        else runCatching { health.check(status.serverName, synapseOk = true, synapseDetail = client.server.displayUrl, forceLarge = forceHealth) }.getOrDefault(emptyList())
     }
     val m = media.await()
     val usersActive = active.await()

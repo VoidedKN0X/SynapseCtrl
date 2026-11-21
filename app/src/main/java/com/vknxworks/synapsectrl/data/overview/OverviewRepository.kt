@@ -43,7 +43,7 @@ class OverviewRepository(
         if (!force && current?.summary != null && System.currentTimeMillis() - current.summary.loadedAt < maxAgeMs) return
         update(id) { it.copy(loading = true) }
         try {
-            val base = loadSummary(active.client, health, includeMedia = false)
+            val base = loadSummary(active.client, health, includeMedia = false, forceHealth = force)
             val key = MediaTotalsCache.keyFor(active.client)
             val reuse = if (force) null else MediaTotalsCache.fresh(key)
             val summary = base.withMedia(reuse ?: MediaTotalsCache.last(key))

@@ -31,10 +31,12 @@ import com.vknxworks.synapsectrl.ui.notices.ServerNoticeScreen
 import com.vknxworks.synapsectrl.ui.reports.FederationScreen
 import com.vknxworks.synapsectrl.ui.reports.ReportScreen
 import com.vknxworks.synapsectrl.ui.reports.ReportsScreen
+import com.vknxworks.synapsectrl.ui.rooms.RoomMessagesScreen
 import com.vknxworks.synapsectrl.ui.rooms.RoomScreen
 import com.vknxworks.synapsectrl.ui.rooms.RoomsScreen
 import com.vknxworks.synapsectrl.ui.users.CreateUserScreen
 import com.vknxworks.synapsectrl.ui.users.UserScreen
+import com.vknxworks.synapsectrl.ui.users.UserSessionsScreen
 import com.vknxworks.synapsectrl.ui.users.UsersScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -257,8 +259,10 @@ private fun AppNavHost(navController: NavHostController) {
         composable<UserRoute> { UserScreen(it.toRoute<UserRoute>().userId) }
         composable<CreateUserRoute> { CreateUserScreen() }
         composable<UserMediaRoute> { UserMediaScreen(it.toRoute<UserMediaRoute>().userId) }
+        composable<UserSessionsRoute> { UserSessionsScreen(it.toRoute<UserSessionsRoute>().userId) }
         composable<InvitesRoute> { InvitesScreen(createOnOpen = it.toRoute<InvitesRoute>().create) }
         composable<RoomRoute> { RoomScreen(it.toRoute<RoomRoute>().roomId) }
+        composable<RoomMessagesRoute> { RoomMessagesScreen(it.toRoute<RoomMessagesRoute>().roomId) }
         composable<ReportRoute> { ReportScreen(it.toRoute<ReportRoute>().id) }
         composable<FederationRoute> { FederationScreen() }
         composable<ServerNoticeRoute> { ServerNoticeScreen(it.toRoute<ServerNoticeRoute>().userId) }

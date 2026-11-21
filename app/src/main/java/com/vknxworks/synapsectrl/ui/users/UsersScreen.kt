@@ -57,7 +57,10 @@ import com.vknxworks.synapsectrl.ui.components.ChoiceSheet
 import com.vknxworks.synapsectrl.ui.components.ConnectionBanner
 import com.vknxworks.synapsectrl.ui.components.CtrlSquareButton
 import com.vknxworks.synapsectrl.ui.components.CtrlTextButton
+import com.vknxworks.synapsectrl.data.admin.findByThreepid
+import androidx.compose.material.icons.outlined.AlternateEmail
 import com.vknxworks.synapsectrl.ui.components.EmptyState
+import com.vknxworks.synapsectrl.ui.components.GroupRow
 import com.vknxworks.synapsectrl.ui.components.TabTitle
 import com.vknxworks.synapsectrl.ui.components.relativeTime
 import com.vknxworks.synapsectrl.ui.components.topDivider
@@ -77,7 +80,8 @@ enum class UserFilter { ACTIVE, DEACTIVATED, ADMINS, GUESTS, ALL }
 /** Local users: search, filter, sort, and open one to manage it. */
 @Composable
 fun UsersScreen() {
-    val c = LocalContext.current.container
+    val context = LocalContext.current
+    val c = context.container
     val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
     val active by c.sessions.active.collectAsStateWithLifecycle()
@@ -87,6 +91,25 @@ fun UsersScreen() {
     var filter by rememberSaveable { mutableStateOf(UserFilter.ACTIVE) }
     var order by rememberSaveable { mutableStateOf(UserOrder.NAME) }
     var sortOpen by remember { mutableStateOf(false) }
+    var findBusy by remember { mutableStateOf(false) }
+    val actions = com.vknxworks.synapsectrl.ui.common.rememberScreenActions()
+
+    /** GET /_synapse/admin/v1/threepid/email/users/<address>: opens the account that has this e-mail address. */
+    fun findByEmail(address: String) {
+        val client = active?.client ?: return
+        if (findBusy) return
+        findBusy = true
+        scope.launch {
+            try {
+                val owner = client.findByThreepid("email", address)
+                if (owner != null) nav.navigate(UserRoute(owner)) else actions.say(context.getString(R.string.find_email_none, address))
+            } catch (e: ApiError) {
+                actions.say(com.vknxworks.synapsectrl.ui.components.errorMessage(context, e, server?.host.orEmpty()))
+            } finally {
+                findBusy = false
+            }
+        }
+    }
 
     val users = remember { mutableStateListOf<AdminUser>() }
     val deviceCounts = remember { mutableStateMapOf<String, Long>() }
@@ -138,7 +161,6 @@ fun UsersScreen() {
         load(null)
     }
 
-    val actions = com.vknxworks.synapsectrl.ui.common.rememberScreenActions()
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             TabTitle(stringResource(R.string.tab_users)) {
@@ -172,6 +194,21 @@ fun UsersScreen() {
             ) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     val err = error
+                    // The search only looks at user IDs and display names; an e-mail address is looked up on its own.
+                    val email = ThreepidInput.email(query)
+                    if (email != null) {
+                        item(key = "find-email") {
+                            com.vknxworks.synapsectrl.ui.components.Group {
+                                GroupRow(
+                                    stringResource(R.string.find_email_title),
+                                    stringResource(R.string.find_email_subtitle, email),
+                                    icon = Icons.Outlined.AlternateEmail,
+                                    showChevron = true,
+                                    onClick = if (findBusy) null else ({ findByEmail(email) }),
+                                )
+                            }
+                        }
+                    }
                     when {
                         users.isEmpty() && err != null -> item { ErrorBlock(err) { reload++ } }
                         users.isEmpty() && loading -> item { Loading() }

@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.AutoDelete
+import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.GppBad
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
@@ -48,6 +50,7 @@ import com.vknxworks.synapsectrl.data.admin.deleteRoom
 import com.vknxworks.synapsectrl.data.admin.deleteStatus
 import com.vknxworks.synapsectrl.data.admin.kick
 import com.vknxworks.synapsectrl.data.admin.makeRoomAdmin
+import com.vknxworks.synapsectrl.data.admin.purgeHistory
 import com.vknxworks.synapsectrl.data.admin.quarantineRoomMedia
 import com.vknxworks.synapsectrl.data.admin.room
 import com.vknxworks.synapsectrl.data.admin.roomMembers
@@ -69,6 +72,7 @@ import com.vknxworks.synapsectrl.ui.components.GroupRow
 import com.vknxworks.synapsectrl.ui.components.GroupSwitch
 import com.vknxworks.synapsectrl.ui.components.ScreenTopBar
 import com.vknxworks.synapsectrl.ui.nav.LocalNavigator
+import com.vknxworks.synapsectrl.ui.nav.RoomMessagesRoute
 import com.vknxworks.synapsectrl.ui.nav.UserRoute
 import com.vknxworks.synapsectrl.ui.theme.CtrlColors
 import com.vknxworks.synapsectrl.ui.theme.CtrlType
@@ -89,6 +93,7 @@ private sealed class Pending {
     data object PickKick : Pending()
     data class Kick(val userId: String) : Pending()
     data object Delete : Pending()
+    data object Purge : Pending()
 }
 
 /** One room: its settings and members, and the admin actions for it. */
@@ -108,6 +113,7 @@ fun RoomScreen(roomId: String) {
     var reload by remember { mutableStateOf(0) }
     var pending by remember { mutableStateOf<Pending?>(null) }
     var deleting by remember { mutableStateOf<String?>(null) }
+    var purging by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(roomId, reload, server?.id) {
         val client = active?.client ?: return@LaunchedEffect
@@ -190,6 +196,11 @@ fun RoomScreen(roomId: String) {
                             ).joinToString("\n"),
                             icon = Icons.Outlined.Info,
                         )
+                        GroupRow(
+                            stringResource(R.string.room_messages_title), stringResource(R.string.room_messages_subtitle),
+                            icon = Icons.Outlined.Chat, showChevron = true,
+                            onClick = { nav.navigate(RoomMessagesRoute(roomId)) },
+                        )
                         i.stateTypes?.takeIf { it.isNotEmpty() }?.let { types ->
                             GroupRow(
                                 stringResource(R.string.room_state_title),
@@ -224,6 +235,11 @@ fun RoomScreen(roomId: String) {
                             }
                             GroupSwitch(stringResource(R.string.block_room), stringResource(R.string.block_room_subtitle), checked = i.block?.block == true, icon = Icons.Outlined.Block) { pending = Pending.Block(it) }
                             GroupRow(stringResource(R.string.quarantine_room_media), stringResource(R.string.quarantine_room_media_subtitle), icon = Icons.Outlined.GppBad, onClick = { pending = Pending.Quarantine })
+                            GroupRow(
+                                stringResource(R.string.purge_history), stringResource(R.string.purge_history_subtitle),
+                                icon = Icons.Outlined.AutoDelete, iconTint = MaterialTheme.colorScheme.error, titleColor = MaterialTheme.colorScheme.error,
+                                onClick = { pending = Pending.Purge },
+                            )
                         }
                         Group(footer = stringResource(R.string.delete_room_footer)) {
                             GroupRow(
@@ -282,6 +298,15 @@ fun RoomScreen(roomId: String) {
             userId = p.userId,
             onDismiss = { pending = null },
         ) { reason -> change(R.string.done_removed) { client.kick(roomId, p.userId, reason) } }
+        Pending.Purge -> PurgeHistoryDialog(
+            room = i.room,
+            onDismiss = { pending = null },
+        ) { days, deleteLocal ->
+            pending = null
+            actions.run(null) {
+                purging = client.purgeHistory(roomId, System.currentTimeMillis() - days * 86_400_000L, deleteLocal).purgeId
+            }
+        }
         Pending.Delete -> DeleteRoomDialog(
             room = i.room,
             adminUserId = server?.userId.orEmpty(),
@@ -293,6 +318,8 @@ fun RoomScreen(roomId: String) {
             }
         }
     }
+
+    purging?.let { id -> PurgeProgressDialog(purgeId = id, onClose = { purging = null }) }
 
     deleting?.let { id ->
         DeleteProgressDialog(deleteId = id, onClose = {
