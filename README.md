@@ -22,6 +22,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **App shortcuts**: New invite, Users, Reports.
 - **Safe by design:** read-only mode per server, a confirmation for every change, the user or room ID typed in for deactivating, deleting a room and deleting old local media, app lock with **Confirm changes**, certificate pinning, **Hide in screenshots** and **Hide in recent apps**, and access tokens encrypted with the Android Keystore (in the StrongBox security chip when the phone has one).
 - **Back up and restore settings** to a file: the privacy switches and the notification choices, never servers, tokens, the PIN or certificates.
+- **In Dutch or English**, following your phone's language.
 - **Several servers**, and sign-in with an admin password (SynapseCtrl gets its own token and never stores the password) or a pasted access token.
 
 ## Requirements

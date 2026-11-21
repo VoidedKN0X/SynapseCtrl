@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SynapseCtrl</string>
-    <string name="vendor">VKNXWorks</string>
+    <string name="app_name" translatable="false">SynapseCtrl</string>
+    <string name="vendor" translatable="false">VKNXWorks</string>
     <string name="tab_overview">Overview</string>
     <string name="tab_overview_hint">Your Synapse server at a glance: who\'s signed in, health and what needs attention.</string>
     <string name="back">Back</string>
@@ -17,10 +17,10 @@
     <string name="bugs_title">Report a bug</string>
     <string name="bugs_subtitle">Found a problem or have an idea? Open an issue on GitHub</string>
     <string name="source_title">Source code</string>
-    <string name="source_subtitle">github.com/VoidedKN0X/SynapseCtrl</string>
+    <string name="source_subtitle" translatable="false">github.com/VoidedKN0X/SynapseCtrl</string>
     <string name="licence_title">Licence</string>
-    <string name="licence_subtitle">GNU General Public License v3.0</string>
-    <string name="about_footer">%1$s %2$s · %3$s</string>
+    <string name="licence_subtitle" translatable="false">GNU General Public License v3.0</string>
+    <string name="about_footer" translatable="false">%1$s %2$s · %3$s</string>
     <string name="theme_system">Follow system</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
@@ -90,12 +90,12 @@
     <string name="error_cleartext">SynapseCtrl won\'t use plain HTTP for %1$s: it\'s only allowed for addresses on your own network, with the server\'s HTTP switch on.</string>
     <string name="error_blocked_host">SynapseCtrl only connects to the servers you added, so this request wasn\'t sent.</string>
     <string name="error_server">Synapse returned an error (%1$d).</string>
-    <string name="error_with_detail">%1$s\n\n%2$s</string>
+    <string name="error_with_detail" translatable="false">%1$s\n\n%2$s</string>
     <string name="error_generic">Something went wrong.</string>
     <string name="error_read_only">This server is in read-only mode, so nothing was changed. Turn read-only mode off to make changes.</string>
     <string name="error_cancelled">Cancelled: the change wasn\'t confirmed with your fingerprint or app PIN, so nothing was sent.</string>
     <string name="stale_banner">Showing the state from %1$s. %2$s</string>
-    <string name="overview_status_line">Synapse · %1$s</string>
+    <string name="overview_status_line" translatable="false">Synapse · %1$s</string>
     <string name="overview_online">Online</string>
     <string name="overview_offline">Offline</string>
     <string name="you_footer_badges" translatable="false">GOOGLE-FREE · TELEMETRY-FREE · ARM64</string>
@@ -197,7 +197,7 @@
     <string name="nt_public_text">Something on your Synapse server needs a look. Unlock to see it.</string>
     <string name="nt_unreachable_title">Can\'t reach %1$s</string>
     <string name="nt_signin_title">Can\'t sign in to %1$s</string>
-    <string name="value_ms">%1$s ms</string>
+    <string name="value_ms" translatable="false">%1$s ms</string>
     <string name="copy">Copy</string>
     <string name="copied">Copied</string>
     <string name="group_push">Push through ntfy</string>
@@ -233,8 +233,8 @@
     <string name="password_keep_hint">Leave empty to keep the current sign-in</string>
     <string name="field_token">Access token</string>
     <string name="token_hint">From an admin account. It will be logged out when you remove this server, so don\'t paste the token your chat app uses.</string>
-    <string name="device_name">SynapseCtrl (Android)</string>
-    <string name="synapse_version">Synapse %1$s</string>
+    <string name="device_name" translatable="false">SynapseCtrl (Android)</string>
+    <string name="synapse_version" translatable="false">Synapse %1$s</string>
     <string name="admin_confirmed">Server admin</string>
     <string name="read_only_mode_footer">Read-only mode hides every write action and refuses to send one, even if a screen still shows it.</string>
     <string name="logout_failed">%1$s was removed, but its access token couldn\'t be logged out on the server. Log it out there yourself (the \"SynapseCtrl (Android)\" device of your admin account).</string>
@@ -360,7 +360,7 @@
     <string name="notice_sent_all">Notice sent to %1$d users</string>
     <string name="notice_sent_some">Sent to %1$d of %2$d users. %3$s</string>
     <!-- Notifications -->
-    <string name="nt_title_server">%1$s: %2$s</string>
+    <string name="nt_title_server" translatable="false">%1$s: %2$s</string>
     <string name="ev_report">New event reports</string>
     <string name="ev_report_sub">Someone on your server reported a message</string>
     <string name="ev_health">Health check failing</string>
