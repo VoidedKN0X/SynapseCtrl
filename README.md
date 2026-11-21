@@ -21,6 +21,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Notifications** from SynapseCtrl's own background checks: new event reports, failing health checks, unreachable servers, new users and media over a limit, with optional **push through ntfy**.
 - **App shortcuts**: New invite, Users, Reports.
 - **Safe by design:** read-only mode per server, a confirmation for every change, the user or room ID typed in for deactivating, deleting a room and deleting old local media, app lock with **Confirm changes**, certificate pinning, **Hide in screenshots** and **Hide in recent apps**, and access tokens encrypted with the Android Keystore (in the StrongBox security chip when the phone has one).
+- **Back up and restore settings** to a file: the privacy switches and the notification choices, never servers, tokens, the PIN or certificates.
 - **Several servers**, and sign-in with an admin password (SynapseCtrl gets its own token and never stores the password) or a pasted access token.
 
 ## Requirements

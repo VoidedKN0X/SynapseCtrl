@@ -794,4 +794,28 @@
     <string name="purge_status_active">Deleting old messages</string>
     <string name="purge_status_done_hint">The space is free for Synapse to reuse. Giving it back to the disk needs a VACUUM FULL on the database.</string>
     <string name="purge_status_id">Purge ID: %s</string>
+
+    <!-- Back up and restore settings -->
+    <string name="backup_title">Back up and restore</string>
+    <string name="backup_footer">A small file with SynapseCtrl\'s own settings: the two privacy switches, and what the background checks notify about, how often and the media limit. Your servers, access tokens, app PIN and trusted certificates are never in it. Restoring never touches the app lock, never turns background checks or push on or off, and never turns a privacy switch off.</string>
+    <string name="backup_save">Save settings to a file</string>
+    <string name="backup_save_sub">Pick where to keep it</string>
+    <string name="backup_restore">Restore settings from a file</string>
+    <string name="backup_restore_sub">Shows what will change and asks first</string>
+    <string name="backup_saved">Settings saved</string>
+    <string name="backup_save_failed">Couldn\'t save the file</string>
+    <string name="backup_not_valid">That isn\'t a SynapseCtrl settings file</string>
+    <string name="backup_too_new">That file was made by a newer SynapseCtrl. Update the app first.</string>
+    <string name="backup_restore_title">Restore these settings?</string>
+    <string name="backup_restore_body">Saved on %1$s. Your settings are replaced with:\n\n%2$s</string>
+    <string name="backup_restore_confirm">Restore</string>
+    <string name="backup_restored">Settings restored</string>
+    <string name="backup_restore_failed">Couldn\'t restore the settings</string>
+    <string name="backup_line_hide_screenshots">Hide in screenshots: on</string>
+    <string name="backup_line_hide_recents">Hide in recent apps: on</string>
+    <string name="backup_line_interval">Check every %d minutes</string>
+    <string name="backup_line_events">Notify about: %s</string>
+    <string name="backup_line_events_none">nothing</string>
+    <string name="backup_line_media">Media limit: %d GB</string>
+    <string name="backup_line_nothing">Nothing: the file has no settings this version knows.</string>
 </resources>
