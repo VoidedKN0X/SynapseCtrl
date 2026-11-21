@@ -19,6 +19,7 @@ Built and checked by CI only: nothing here has been run on a phone yet.
 
 ### Fixed
 
+- **Fixed before release: the app would have crashed at start with the new build tools.** SynapseCtrl uses WorkManager for its background work, and WorkManager stores its jobs in a small Room database that is created by name when the app starts. The shrinker (R8) in Android Gradle Plugin 9 is stricter than the old one and removed the constructor that needs, which makes the app stop right at launch (a known problem with Room 2.6.1 under Android Gradle Plugin 9). A keep rule for that constructor, the same one newer Room versions ship themselves, is now in `app/proguard-rules.pro`. No released version was affected: the new build tools have not been in any release. Built by CI only; not yet run on a phone.
 - **The refresh indicator can't get stuck any more.** Leaving the Overview while it was still loading could leave it marked as loading until the next refresh finished. It is now always cleared when a load ends or is interrupted.
 
 ## Project updates (2026-11-20)
