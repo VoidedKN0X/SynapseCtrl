@@ -113,7 +113,10 @@
     <string name="lock_too_many">Trop d\'essais. Réessayez dans %1$d s</string>
     <string name="lock_forgot">Code PIN oublié ?</string>
     <string name="lock_forgot_title">Vous avez oublié votre code PIN ?</string>
-    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos jetons d\'accès enregistrés. SynapseCtrl supprimera chaque serveur avec son jeton. Les jetons restent valides sur le serveur jusqu\'à ce que vous les déconnectiez là-bas (par exemple depuis la liste des sessions du compte admin). Rien d\'autre ne change sur vos serveurs.</string>
+    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos jetons d\'accès enregistrés. SynapseCtrl supprimera chaque serveur avec son jeton. Les jetons restent valides sur le serveur jusqu\'à ce que vous les déconnectiez là-bas (par exemple depuis la liste des sessions du compte admin). Rien d\'autre ne change sur vos serveurs. Si votre téléphone a un verrouillage d\'écran, vous confirmerez d\'abord avec celui-ci.</string>
+    <string name="lock_reset_prompt_title">Réinitialiser le verrouillage de SynapseCtrl</string>
+    <string name="lock_reset_prompt_subtitle">Utilisez le verrouillage d\'écran de votre téléphone pour confirmer votre identité</string>
+    <string name="lock_reset_prompt_failed">Impossible d\'afficher le verrouillage d\'écran</string>
     <string name="lock_forgot_confirm">Supprimer les serveurs et réinitialiser</string>
     <string name="lock_choose_pin">Choisissez un code PIN</string>
     <string name="lock_enable_intro">Au moins %1$d chiffres, différent du code PIN de votre téléphone. Si vous l\'oubliez, la seule solution est d\'ajouter à nouveau vos serveurs.</string>
@@ -552,6 +555,9 @@
     <string name="delete_status_aliases">Adresses déplacées : %1$s</string>
     <string name="delete_status_new_room">Nouveau salon : %1$s</string>
     <string name="delete_status_id">Suppression %1$s</string>
+    <string name="delete_status_unknown">État de la suppression indisponible</string>
+    <string name="delete_status_gone">Synapse ne connaît plus l\'avancement de cette suppression. Il ne le garde qu\'un moment après la fin et l\'oublie à chaque redémarrage, ou il n\'a pas pu être vérifié plusieurs fois de suite. Consultez la liste des salons pour voir si le salon a disparu.</string>
+    <string name="delete_started_no_status">Suppression du salon lancée. Synapse n\'a donné aucun identifiant, son avancement ne peut donc pas être suivi ici.</string>
     <string name="close_keep_running">Fermer (continue)</string>
     <string name="clear_search">Effacer la recherche</string>
     <string name="type_to_confirm">Action irréversible. Saisissez ceci pour confirmer :</string>
@@ -756,6 +762,9 @@
     <string name="purge_status_active">Suppression des anciens messages</string>
     <string name="purge_status_done_hint">L\'espace est libre pour que Synapse le réutilise. Le rendre au disque nécessite un VACUUM FULL sur la base de données.</string>
     <string name="purge_status_id">ID de purge : %s</string>
+    <string name="purge_status_unknown">État de la purge indisponible</string>
+    <string name="purge_status_gone">Synapse ne connaît plus l\'avancement de cette purge. Il ne le garde qu\'un moment après la fin et l\'oublie à chaque redémarrage, ou il n\'a pas pu être vérifié plusieurs fois de suite. Consultez les messages du salon pour voir si les anciens ont disparu.</string>
+    <string name="purge_started_no_status">Purge lancée. Synapse n\'a donné aucun identifiant, son avancement ne peut donc pas être suivi ici.</string>
     <string name="backup_title">Sauvegarder et restaurer</string>
     <string name="backup_footer">Un petit fichier avec les réglages propres à SynapseCtrl : les deux options de confidentialité, et ce que les vérifications en arrière-plan signalent, à quelle fréquence et la limite des médias. Vos serveurs, jetons d\'accès, code PIN et certificats approuvés n\'y figurent jamais. La restauration ne touche jamais au verrouillage, n\'active ni ne désactive jamais les vérifications en arrière-plan ou le push, et ne désactive jamais une option de confidentialité.</string>
     <string name="backup_save">Enregistrer les réglages dans un fichier</string>

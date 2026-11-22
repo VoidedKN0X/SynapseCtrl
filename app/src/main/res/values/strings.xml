@@ -122,7 +122,10 @@
     <string name="lock_too_many">Too many tries. Try again in %1$d s</string>
     <string name="lock_forgot">Forgot PIN?</string>
     <string name="lock_forgot_title">Forgot your PIN?</string>
-    <string name="lock_forgot_body">The PIN can\'t be recovered, because it encrypts your saved access tokens. SynapseCtrl will remove every server with its token. The tokens stay valid on the server until you log them out there (for example from the admin account\'s session list). Nothing else changes on your servers.</string>
+    <string name="lock_forgot_body">The PIN can\'t be recovered, because it encrypts your saved access tokens. SynapseCtrl will remove every server with its token. The tokens stay valid on the server until you log them out there (for example from the admin account\'s session list). Nothing else changes on your servers. If your phone has a screen lock, you\'ll confirm with it first.</string>
+    <string name="lock_reset_prompt_title">Reset SynapseCtrl\'s app lock</string>
+    <string name="lock_reset_prompt_subtitle">Use your phone\'s screen lock to confirm it\'s you</string>
+    <string name="lock_reset_prompt_failed">Couldn\'t show the screen lock prompt</string>
     <string name="lock_forgot_confirm">Remove servers and reset</string>
     <string name="lock_choose_pin">Choose an app PIN</string>
     <string name="lock_enable_intro">At least %1$d digits, different from your phone\'s PIN. If you forget it, the only way back in is to add your servers again.</string>
@@ -578,6 +581,9 @@
     <string name="delete_status_aliases">Addresses moved: %1$s</string>
     <string name="delete_status_new_room">New room: %1$s</string>
     <string name="delete_status_id">Deletion %1$s</string>
+    <string name="delete_status_unknown">Deletion status unavailable</string>
+    <string name="delete_status_gone">Synapse no longer has the progress of this deletion. It keeps it only for a while after the deletion ends and forgets it when it restarts, or it couldn\'t be checked several times in a row. Check the room list to see whether the room is gone.</string>
+    <string name="delete_started_no_status">Room deletion started. Synapse gave no ID, so its progress can\'t be followed here.</string>
     <string name="close_keep_running">Close (keeps running)</string>
     <!-- Common -->
     <string name="clear_search">Clear search</string>
@@ -794,6 +800,9 @@
     <string name="purge_status_active">Deleting old messages</string>
     <string name="purge_status_done_hint">The space is free for Synapse to reuse. Giving it back to the disk needs a VACUUM FULL on the database.</string>
     <string name="purge_status_id">Purge ID: %s</string>
+    <string name="purge_status_unknown">Purge status unavailable</string>
+    <string name="purge_status_gone">Synapse no longer has the progress of this purge. It keeps it only for a while after the purge ends and forgets it when it restarts, or it couldn\'t be checked several times in a row. Look at the room\'s messages to see whether the old ones are gone.</string>
+    <string name="purge_started_no_status">Purge started. Synapse gave no ID, so its progress can\'t be followed here.</string>
 
     <!-- Back up and restore settings -->
     <string name="backup_title">Back up and restore</string>

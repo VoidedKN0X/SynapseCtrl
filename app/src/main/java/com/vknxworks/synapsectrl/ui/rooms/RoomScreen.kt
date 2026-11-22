@@ -83,6 +83,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.flow.first
+import com.vknxworks.synapsectrl.data.admin.StatusPoll
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
 
 private class RoomInfo(val room: AdminRoom, val members: List<String>?, val stateTypes: Map<String, Int>?, val block: BlockStatus?)
 
@@ -304,7 +309,9 @@ fun RoomScreen(roomId: String) {
         ) { days, deleteLocal ->
             pending = null
             actions.run(null) {
-                purging = client.purgeHistory(roomId, System.currentTimeMillis() - days * 86_400_000L, deleteLocal).purgeId
+                val id = client.purgeHistory(roomId, System.currentTimeMillis() - days * 86_400_000L, deleteLocal).purgeId
+                // Without an id there is no status to follow: say it started instead of opening the dialog.
+                if (StatusPoll.followable(id)) purging = id else actions.snackbar.showSnackbar(context.getString(R.string.purge_started_no_status))
             }
         }
         Pending.Delete -> DeleteRoomDialog(
@@ -314,7 +321,8 @@ fun RoomScreen(roomId: String) {
         ) { block, purge, moveTo, name, message ->
             pending = null
             actions.run(null) {
-                deleting = client.deleteRoom(roomId, block, purge, moveTo, name, message).deleteId
+                val id = client.deleteRoom(roomId, block, purge, moveTo, name, message).deleteId
+                if (StatusPoll.followable(id)) deleting = id else actions.snackbar.showSnackbar(context.getString(R.string.delete_started_no_status))
             }
         }
     }
@@ -386,17 +394,30 @@ private fun DeleteProgressDialog(deleteId: String, onClose: () -> Unit) {
     val c = LocalContext.current.container
     var status by remember { mutableStateOf<DeleteStatus?>(null) }
     var failedToCheck by remember { mutableStateOf(false) }
+    var gone by remember { mutableStateOf(false) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(deleteId) {
-        while (status?.finished != true) {
+        val poll = StatusPoll()
+        while (true) {
+            // Only while SynapseCtrl is on screen: nothing is asked in the background.
+            lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.STARTED) }
             val client = c.sessions.active.value?.client ?: break
-            val s = runCatching { client.deleteStatus(deleteId) }.getOrNull()
-            if (s != null) {
+            val next = try {
+                val s = client.deleteStatus(deleteId)
                 status = s
                 failedToCheck = false
-            } else {
+                poll.onStatus(s.finished)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
                 failedToCheck = true
+                poll.onFailure(notFound = e is ApiError.NotFound)
             }
-            if (status?.finished == true) break
+            if (next == StatusPoll.Next.DONE) break
+            if (next == StatusPoll.Next.GONE) {
+                gone = true
+                break
+            }
             delay(2000)
         }
     }
@@ -409,21 +430,23 @@ private fun DeleteProgressDialog(deleteId: String, onClose: () -> Unit) {
                     when (s?.status) {
                         "complete" -> R.string.delete_status_complete
                         "failed" -> R.string.delete_status_failed
-                        else -> R.string.delete_status_running
+                        else -> if (gone) R.string.delete_status_unknown else R.string.delete_status_running
                     },
                 ),
             )
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (s?.finished != true) {
+                if (gone) {
+                    Text(stringResource(R.string.delete_status_gone), color = Health.warn)
+                } else if (s?.finished != true) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(12.dp))
                         Text(stringResource(if (s?.status == "active") R.string.delete_status_active else R.string.delete_status_scheduled))
                     }
                 }
-                if (failedToCheck) Text(stringResource(R.string.delete_status_check_failed), color = Health.warn, style = MaterialTheme.typography.bodySmall)
+                if (failedToCheck && !gone) Text(stringResource(R.string.delete_status_check_failed), color = Health.warn, style = MaterialTheme.typography.bodySmall)
                 s?.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 s?.shutdownRoom?.let { r ->
                     if (r.kickedUsers.isNotEmpty()) Text(stringResource(R.string.delete_status_kicked, r.kickedUsers.size), style = MaterialTheme.typography.bodySmall)
@@ -435,7 +458,7 @@ private fun DeleteProgressDialog(deleteId: String, onClose: () -> Unit) {
             }
         },
         confirmButton = {
-            CtrlTextButton(onClick = onClose) { Text(stringResource(if (s?.finished == true) R.string.lock_done else R.string.close_keep_running)) }
+            CtrlTextButton(onClick = onClose) { Text(stringResource(if (s?.finished == true || gone) R.string.lock_done else R.string.close_keep_running)) }
         },
     )
 }

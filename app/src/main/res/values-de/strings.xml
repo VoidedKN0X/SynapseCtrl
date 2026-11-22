@@ -113,7 +113,10 @@
     <string name="lock_too_many">Zu viele Versuche. Erneut in %1$d s</string>
     <string name="lock_forgot">PIN vergessen?</string>
     <string name="lock_forgot_title">PIN vergessen?</string>
-    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten Zugriffstokens verschlüsselt. SynapseCtrl entfernt jeden Server samt Token. Die Tokens bleiben auf dem Server gültig, bis du sie dort abmeldest (zum Beispiel in der Sitzungsliste des Admin-Kontos). Sonst ändert sich nichts auf deinen Servern.</string>
+    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten Zugriffstokens verschlüsselt. SynapseCtrl entfernt jeden Server samt Token. Die Tokens bleiben auf dem Server gültig, bis du sie dort abmeldest (zum Beispiel in der Sitzungsliste des Admin-Kontos). Sonst ändert sich nichts auf deinen Servern. Wenn dein Smartphone eine Displaysperre hat, bestätigst du zuerst damit.</string>
+    <string name="lock_reset_prompt_title">App-Sperre von SynapseCtrl zurücksetzen</string>
+    <string name="lock_reset_prompt_subtitle">Bestätige mit der Displaysperre deines Smartphones, dass du es bist</string>
+    <string name="lock_reset_prompt_failed">Displaysperre konnte nicht angezeigt werden</string>
     <string name="lock_forgot_confirm">Server entfernen und zurücksetzen</string>
     <string name="lock_choose_pin">App-PIN wählen</string>
     <string name="lock_enable_intro">Mindestens %1$d Ziffern, anders als die PIN deines Smartphones. Wenn du sie vergisst, musst du deine Server erneut hinzufügen.</string>
@@ -552,6 +555,9 @@
     <string name="delete_status_aliases">Adressen verschoben: %1$s</string>
     <string name="delete_status_new_room">Neuer Raum: %1$s</string>
     <string name="delete_status_id">Löschung %1$s</string>
+    <string name="delete_status_unknown">Status des Löschens nicht verfügbar</string>
+    <string name="delete_status_gone">Synapse kennt den Fortschritt dieses Löschvorgangs nicht mehr. Es behält ihn nur eine Weile nach dem Ende und vergisst ihn bei einem Neustart, oder er konnte mehrmals hintereinander nicht abgefragt werden. Sieh in der Raumliste nach, ob der Raum weg ist.</string>
+    <string name="delete_started_no_status">Löschen des Raums gestartet. Synapse hat keine ID zurückgegeben, daher lässt sich der Fortschritt hier nicht verfolgen.</string>
     <string name="close_keep_running">Schließen (läuft weiter)</string>
     <string name="clear_search">Suche löschen</string>
     <string name="type_to_confirm">Das kann nicht rückgängig gemacht werden. Gib zur Bestätigung Folgendes ein:</string>
@@ -756,6 +762,9 @@
     <string name="purge_status_active">Alte Nachrichten werden gelöscht</string>
     <string name="purge_status_done_hint">Der Platz ist frei, damit Synapse ihn wiederverwenden kann. Ihn an die Festplatte zurückzugeben, braucht ein VACUUM FULL auf der Datenbank.</string>
     <string name="purge_status_id">Bereinigungs-ID: %s</string>
+    <string name="purge_status_unknown">Status der Bereinigung nicht verfügbar</string>
+    <string name="purge_status_gone">Synapse kennt den Fortschritt dieser Bereinigung nicht mehr. Es behält ihn nur eine Weile nach dem Ende und vergisst ihn bei einem Neustart, oder er konnte mehrmals hintereinander nicht abgefragt werden. Sieh in den Nachrichten des Raums nach, ob die alten weg sind.</string>
+    <string name="purge_started_no_status">Bereinigung gestartet. Synapse hat keine ID zurückgegeben, daher lässt sich der Fortschritt hier nicht verfolgen.</string>
     <string name="backup_title">Sichern und wiederherstellen</string>
     <string name="backup_footer">Eine kleine Datei mit den eigenen Einstellungen von SynapseCtrl: die beiden Datenschutzschalter sowie worüber die Hintergrundprüfungen benachrichtigen, wie oft und das Medienlimit. Deine Server, Zugriffstokens, App-PIN und vertrauten Zertifikate sind nie darin. Wiederherstellen ändert nie die App-Sperre, schaltet Hintergrundprüfungen oder Push nie ein oder aus und schaltet nie einen Datenschutzschalter aus.</string>
     <string name="backup_save">Einstellungen in eine Datei speichern</string>

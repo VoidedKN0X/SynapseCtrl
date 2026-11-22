@@ -113,7 +113,10 @@
     <string name="lock_too_many">Te veel pogingen. Probeer opnieuw over %1$d s</string>
     <string name="lock_forgot">Pincode vergeten?</string>
     <string name="lock_forgot_title">Je pincode vergeten?</string>
-    <string name="lock_forgot_body">De pincode kan niet hersteld worden, omdat ze je opgeslagen toegangstokens versleutelt. SynapseCtrl verwijdert elke server met zijn token. De tokens blijven geldig op de server tot je ze daar afmeldt (bijvoorbeeld in de sessielijst van het beheerdersaccount). Verder verandert er niets op je servers.</string>
+    <string name="lock_forgot_body">De pincode kan niet hersteld worden, omdat ze je opgeslagen toegangstokens versleutelt. SynapseCtrl verwijdert elke server met zijn token. De tokens blijven geldig op de server tot je ze daar afmeldt (bijvoorbeeld in de sessielijst van het beheerdersaccount). Verder verandert er niets op je servers. Heeft je telefoon een schermvergrendeling, dan bevestig je eerst daarmee.</string>
+    <string name="lock_reset_prompt_title">App-vergrendeling van SynapseCtrl resetten</string>
+    <string name="lock_reset_prompt_subtitle">Bevestig met de schermvergrendeling van je telefoon dat jij het bent</string>
+    <string name="lock_reset_prompt_failed">De schermvergrendeling kon niet getoond worden</string>
     <string name="lock_forgot_confirm">Servers verwijderen en opnieuw beginnen</string>
     <string name="lock_choose_pin">Kies een app-pincode</string>
     <string name="lock_enable_intro">Minstens %1$d cijfers, anders dan de pincode van je telefoon. Als je ze vergeet, kun je alleen terug binnen door je servers opnieuw toe te voegen.</string>
@@ -552,6 +555,9 @@
     <string name="delete_status_aliases">Adressen verplaatst: %1$s</string>
     <string name="delete_status_new_room">Nieuwe kamer: %1$s</string>
     <string name="delete_status_id">Verwijdering %1$s</string>
+    <string name="delete_status_unknown">Status van het verwijderen niet beschikbaar</string>
+    <string name="delete_status_gone">Synapse heeft de voortgang van dit verwijderen niet meer. Het houdt die maar een tijdje bij nadat het klaar is en vergeet ze bij een herstart, of ze kon een paar keer na elkaar niet opgevraagd worden. Kijk in de lijst met kamers of de kamer weg is.</string>
+    <string name="delete_started_no_status">Verwijderen van de kamer gestart. Synapse gaf geen ID terug, dus de voortgang kan je hier niet volgen.</string>
     <string name="close_keep_running">Sluiten (loopt verder)</string>
     <string name="clear_search">Zoekopdracht wissen</string>
     <string name="type_to_confirm">Dit kan niet ongedaan gemaakt worden. Typ dit om te bevestigen:</string>
@@ -756,6 +762,9 @@
     <string name="purge_status_active">Oude berichten worden verwijderd</string>
     <string name="purge_status_done_hint">De ruimte is vrij voor Synapse om opnieuw te gebruiken. Om ze aan de schijf terug te geven, is een VACUUM FULL op de database nodig.</string>
     <string name="purge_status_id">Opruim-ID: %s</string>
+    <string name="purge_status_unknown">Status van het opruimen niet beschikbaar</string>
+    <string name="purge_status_gone">Synapse heeft de voortgang van dit opruimen niet meer. Het houdt die maar een tijdje bij nadat het klaar is en vergeet ze bij een herstart, of ze kon een paar keer na elkaar niet opgevraagd worden. Kijk bij de berichten van de kamer of de oude weg zijn.</string>
+    <string name="purge_started_no_status">Opruimen gestart. Synapse gaf geen ID terug, dus de voortgang kan je hier niet volgen.</string>
     <string name="backup_title">Back-up en herstel</string>
     <string name="backup_footer">Een klein bestand met de eigen instellingen van SynapseCtrl: de twee privacyschakelaars, en waarover de achtergrondcontroles meldingen geven, hoe vaak en de medialimiet. Je servers, toegangstokens, app-pincode en vertrouwde certificaten staan er nooit in. Herstellen raakt de app-vergrendeling nooit aan, zet achtergrondcontroles of push nooit aan of uit, en zet een privacyschakelaar nooit uit.</string>
     <string name="backup_save">Instellingen in een bestand opslaan</string>

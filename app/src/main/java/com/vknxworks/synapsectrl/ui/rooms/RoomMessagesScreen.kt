@@ -68,6 +68,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.longOrNull
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.flow.first
+import com.vknxworks.synapsectrl.data.admin.StatusPoll
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
 
 private val Pretty = Json { prettyPrint = true }
 
@@ -240,17 +245,30 @@ fun PurgeProgressDialog(purgeId: String, onClose: () -> Unit) {
     val c = LocalContext.current.container
     var status by remember { mutableStateOf<PurgeStatus?>(null) }
     var failedToCheck by remember { mutableStateOf(false) }
+    var gone by remember { mutableStateOf(false) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(purgeId) {
-        while (status?.finished != true) {
+        val poll = StatusPoll()
+        while (true) {
+            // Only while SynapseCtrl is on screen: nothing is asked in the background.
+            lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.STARTED) }
             val client = c.sessions.active.value?.client ?: break
-            val s = runCatching { client.purgeStatus(purgeId) }.getOrNull()
-            if (s != null) {
+            val next = try {
+                val s = client.purgeStatus(purgeId)
                 status = s
                 failedToCheck = false
-            } else {
+                poll.onStatus(s.finished)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
                 failedToCheck = true
+                poll.onFailure(notFound = e is ApiError.NotFound)
             }
-            if (status?.finished == true) break
+            if (next == StatusPoll.Next.DONE) break
+            if (next == StatusPoll.Next.GONE) {
+                gone = true
+                break
+            }
             delay(2000)
         }
     }
@@ -263,28 +281,30 @@ fun PurgeProgressDialog(purgeId: String, onClose: () -> Unit) {
                     when (s?.status) {
                         "complete" -> R.string.purge_status_complete
                         "failed" -> R.string.purge_status_failed
-                        else -> R.string.purge_status_running
+                        else -> if (gone) R.string.purge_status_unknown else R.string.purge_status_running
                     },
                 ),
             )
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (s?.finished != true) {
+                if (gone) {
+                    Text(stringResource(R.string.purge_status_gone), color = Health.warn)
+                } else if (s?.finished != true) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(12.dp))
                         Text(stringResource(R.string.purge_status_active))
                     }
                 }
-                if (failedToCheck) Text(stringResource(R.string.delete_status_check_failed), color = Health.warn, style = MaterialTheme.typography.bodySmall)
+                if (failedToCheck && !gone) Text(stringResource(R.string.delete_status_check_failed), color = Health.warn, style = MaterialTheme.typography.bodySmall)
                 s?.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 if (s?.status == "complete") Text(stringResource(R.string.purge_status_done_hint), style = MaterialTheme.typography.bodySmall, color = CtrlColors.Muted)
                 Text(stringResource(R.string.purge_status_id, purgeId), style = CtrlType.Data, color = CtrlColors.Muted)
             }
         },
         confirmButton = {
-            CtrlTextButton(onClick = onClose) { Text(stringResource(if (s?.finished == true) R.string.lock_done else R.string.close_keep_running)) }
+            CtrlTextButton(onClick = onClose) { Text(stringResource(if (s?.finished == true || gone) R.string.lock_done else R.string.close_keep_running)) }
         },
     )
 }

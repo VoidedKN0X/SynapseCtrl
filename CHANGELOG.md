@@ -2,6 +2,17 @@
 
 All notable changes to SynapseCtrl. Every release on GitHub, in Obtainium and in the CtrlF-Droid repo uses the entry for its version.
 
+## Unreleased
+
+### Security
+
+- **"Forgot PIN?" now asks for your phone's own screen lock first.** Before, anyone holding your unlocked phone could tap **Forgot PIN?** on SynapseCtrl's lock screen and reset it (removing your servers) to get past the app lock. Now, after you confirm in the dialog, Android shows its own screen-lock prompt (your phone PIN, pattern or password, or a strong fingerprint) and the reset only happens once that succeeds. Cancelling the prompt changes nothing. If your phone has no screen lock, the reset works as before, straight after the confirmation. The dialog text says so in all four languages. Not yet tried on a phone.
+
+### Fixed
+
+- **The purge and room-deletion progress dialogs no longer keep asking forever.** Synapse keeps the progress of a purge or a deletion only in memory, for a while after it ends, and loses it when it restarts. Once it was gone, the progress dialog asked Synapse again every 2 seconds for as long as it stayed open, still showing "Purging…". Now it stops as soon as Synapse says it doesn't know the job any more, or after 5 failed checks in a row, and the dialog says the status is no longer available and how to check the result (look at the room's messages, or the room list); its button then reads **Done**. While SynapseCtrl is in the background the dialogs don't ask at all, and they carry on when you come back.
+- **A purge or deletion without an ID no longer opens a dialog that can't work.** If Synapse answered without a purge or delete ID, the dialog opened anyway and asked for the status of an empty ID. SynapseCtrl now just says the job started and that its progress can't be followed.
+
 ## v1.4.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.
